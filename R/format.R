@@ -1,12 +1,11 @@
-#' Convinient functions for most frequent data formatting needs.
+#' Convinient functions for most frequently used data formatting needs.
 
 require(lubridate)
 require(data.table)
-require(tidyverse)
-require(modelr)
+require(dplyr)
+require(readr)
 
-
-format_as_percent <- function(num, digits = 2, format="f", ...) {
+format_as_percentage <- function(num, digits = 2, format="f", ...) {
   #convert number to percentage format
   paste0(formatC(100 * num, format = format, digits = digits, ...), "%")
 }
@@ -19,7 +18,7 @@ format_number <- function(x, digits = 2, ...) {
     })
     return(x)
   }else{
-    as.double(format(round(as.numeric(num), digits), nsmall = digits))
+    as.double(format(round(as.numeric(x), digits), nsmall = digits))
   }
 }
 

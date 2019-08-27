@@ -1,11 +1,15 @@
 Package: d8ahelper
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Convinient data manipulation methods and boilerplate code
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Joe Fang
+Maintainer: Joe Fang <fjoe88@gmail.com>
+Description: A set of convenient data cleaning (import/format/transform/summarize) and visualizing functions for helping with data manipulation.
 Encoding: UTF-8
 LazyData: true
+Imports:
+    dplyr,
+    readr,
+    magrittr,
+    data.table,
+    lubridate
