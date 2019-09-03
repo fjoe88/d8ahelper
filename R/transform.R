@@ -52,7 +52,7 @@ coalesce_join <- function(x,
 
   suffix_used <- suffix[ifelse(endsWith(to_coalesce, suffix[1]), 1, 2)]
 
-  #remove suffix and remove duplicates
+  #remove suffix and remove duplicates€
   to_coalesce <- unique(substr(to_coalesce,
                                1,
                                nchar(to_coalesce) - nchar(suffix_used)))

@@ -7,6 +7,7 @@ copy <- function(df,
                  ...) {
   #' if passed in a single string: remove all spaces (comma delimited by default)
   #' if passed in a column from dataframe or tibble: copy unique values to clipboard (comma delimited by default)
+  stopifnot(.Platform$OS.typ %in% c("windows", "unix"))
 
   if (.Platform$OS.type == "windows") {
     #' use utils::writeClipboard if under windows based OS
