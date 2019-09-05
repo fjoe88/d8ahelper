@@ -1,9 +1,13 @@
-A set of convenient data cleaning and visualizing functions for helping with data manipulation.
+# d8ahelper
 
-# Format
+>A set of convenient data cleaning and visualizing functions for helping with data manipulation.
 
-# Summarize
+## [Format](https://github.com/fjoe88/d8ahelper/blob/master/R/format.R)
 
-# Transfer
+## [Summarize](https://github.com/fjoe88/d8ahelper/blob/master/R/summarize.R)
 
-# Transform
+## [Transfer](https://github.com/fjoe88/d8ahelper/blob/master/R/transfer.R)
+
+## [Transform](https://github.com/fjoe88/d8ahelper/blob/master/R/transform.R)
+
+## [Visualize](https://github.com/fjoe88/d8ahelper/blob/master/R/visualize.R)
