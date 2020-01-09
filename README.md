@@ -1,6 +1,6 @@
 # d8ahelpeR
 
-![d8ahelpeR](./IMAGES/logo.jpg)
+![d8ahelpeR](./IMAGES/logo.png)
 
 ###### A set of convenient functions for helping with various aspects of data manipulation.
 
