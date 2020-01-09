@@ -1,12 +1,24 @@
 #' Convinient functions for most frequently used data transferring needs.
 
-copy <- function(df,
-                 col,
+copy_unique <- function(df = paste(readClipboard(), collapse = ","),
+                 col = "lotid",
                  sep = ",",
                  quotes = FALSE,
+                 format_lotid = TRUE,
+                 save_csv = FALSE,
                  ...) {
-  #' if passed in a single string: remove all spaces (comma delimited by default)
-  #' if passed in a column from dataframe or tibble: copy unique values to clipboard (comma delimited by default)
+  #'copy unique values to clipboard
+  #'
+  #'input: chr str copied from clipboard, or a data.frame
+  #' 
+  #'output:
+  #'comma separated string w/ duplicates removed
+  #'a data.frame of unique values in each row
+  #'
+  #' if input is a data.frame, do not return back as a data.frame
+  #' by default, assume lot ids being copied and format them unless set format_lot = FALSE
+  #' if save_csv = TRUE, save output to '1.lot_list.csv'
+ 
   stopifnot(.Platform$OS.typ %in% c("windows", "unix"))
 
   if (.Platform$OS.type == "windows") {
