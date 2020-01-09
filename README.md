@@ -1,5 +1,7 @@
 # d8ahelpeR
 
+![d8ahelpeR](./IMAGES/logo.jpg)
+
 ###### A set of convenient functions for helping with various aspects of data manipulation.
 
 ### [Formatting](https://github.com/fjoe88/d8ahelper/blob/master/R/formatting.R)
