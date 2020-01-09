@@ -1,15 +1,23 @@
-#' Convinient functions for most frequently used data summarizing needs.
+
+
+
+# Summarize ---------------------------------------------------------------------------------
 
 sum_table <- function(df, x, y, sum = TRUE, ...) {
-  stopifnot(is.character(x) && is.character(y))
+  # output a data.frame table with total count of each unique x by y (column)
+
+  if (!is.character(x) &&
+      is.character(y))
+    stop("only accept character x & y")
 
   table <- table(df[[x]], df[[y]])
-  if (!sum) {
-    return(table)
-  } else{
+  if (sum == TRUE) {
     table1 <- cbind(table, Total = rowSums(table))
     table2 <- rbind(table1, Total = colSums(table1))
     return(table2)
+
+  } else {
+    return(table)
   }
 }
 
@@ -19,12 +27,16 @@ sum_col <- function(df,
                     summary_split = FALSE,
                     ...) {
   # returns a dataframe that summarize the input data table
-  stopifnot(is.data.frame(df))
+
+  if (!is.data.frame(df))
+    stop("Only data.frame object is accepted")
+
+  print(class(df))
 
   summary <- dplyr::tibble(
-    "name" = colnames(df),
-    "class" = sapply(df, class),
-    "type" = sapply(df, typeof),
+    "col.name" = colnames(df),
+    "col.class" = sapply(df, class),
+    "col.type" = sapply(df, typeof),
     "unique.val" = sapply(df, function(x) {
       length(unique(x))
     }),
@@ -38,15 +50,15 @@ sum_col <- function(df,
     "examples(mean)" = sapply(df, function(x) {
       if (!is.numeric(x)) {
         unique(x[!is.na(x)])[1]
-      }else{ as.double(format(round(
-            mean(x, na.rm = TRUE), 1
-          ), nsmall = 1))
+
+      } else{
+        as.double(format(round(mean(x, na.rm = TRUE), 1), nsmall = 1))
       }
     }),
-    "summary(min|1Q|median|3Q|max)" = sapply(df, function(x) {
+    "summary(min|1Q|med|3Q|max)" = sapply(df, function(x) {
       if (!is.numeric(x)) {
         paste(unique(x[!is.na(x)])[1:min(10, length(unique(x)))], collapse = " | ")
-      }else{
+      } else{
         paste(
           as.double(format(round(
             min(x, na.rm = TRUE), 1
@@ -96,26 +108,21 @@ sum_col <- function(df,
   )
 }
 
-
-sum_missing <- function(df, top_n = 5, ...) {
-  #returns a tibble that summarize top (n) missing value-column combinations
+sum_missing <- function(df, num = 5, ...) {
+  #give top n missing value column combinations
 
   df[!is.na(df)] <- 0
   df[is.na(df)] <- 1
 
-  df_foo <- dplyr::as_tibble(sapply(df, as.character)) %>%
+  df_foo <- as_tibble(sapply(df, as.character)) %>%
     unite("id", colnames(.), sep = "") %>%
     group_by(id) %>%
-    summarize(n = n()) %>%
+    summarise(n = n()) %>%
     arrange(-n) %>%
-    top_n(top_n) %>%
+    top_n(num) %>%
     rowwise() %>%
     mutate(
-      "position" =
-        paste0(which(strsplit(id, "")[[1]] == "1"),
-               collapse = ","),
-      "colname" = paste0(names(df)[which(strsplit(id, "")[[1]] == "1")],
-                         collapse = ",")
+      "position" = paste0(which(strsplit(id, "")[[1]] == "1"), collapse = ","),
+      "colname" = paste0(names(df)[which(strsplit(id, "")[[1]] == "1")], collapse = ",")
     )
 }
-
