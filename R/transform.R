@@ -2,6 +2,37 @@
 
 # Transform -----------------------------------------------------------------------------------
 
+trim_spaces <- function(x,
+                        leading = FALSE,
+                        trailing = FALSE,
+                        all = FALSE,
+                        replacement = "_") {
+  #'trim leading / trailing by default
+  #'trim in between white spaces if 'all == TRUE'
+  #'reduce white spaces to single separaters specified with 'replacement = '
+
+  if (leading == FALSE &&
+      trailing == FALSE) {
+    x <- gsub("^\\s+|\\s+$", "", x)
+  }
+  else if (leading == TRUE) {
+    x <- gsub("^\\s+", "", x)
+  }
+  else if (trailing == TRUE) {
+    x <- gsub("\\s+$", "", x)
+  }
+
+  if (all == FALSE) {
+    return(x)
+  } else{
+    x <- gsub("^\\s+|\\s+$", "", x)
+    x <- gsub("\\s+", " ", x)
+    x <- gsub(" ", x, replacement = replacement)
+    return(x)
+  }
+
+}
+
 move_left <- function(df, str) {
   #' take col name or RE and move them to far left
   #' accept multiple column names passed in as character vectors

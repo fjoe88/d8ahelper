@@ -1,4 +1,4 @@
-# d8ahelper
+# d8ahelpeR
 
 ###### A set of convenient functions for helping with various aspects of data manipulation.
 
