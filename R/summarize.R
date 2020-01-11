@@ -3,6 +3,22 @@
 
 # Summarize ---------------------------------------------------------------------------------
 
+headtail <- function(df, n = 5) {
+  #' combine head and tail to show first and last n rows of dataframe
+
+  if (nrow(df) <= 2*n) {
+    head(df, nrow(df))
+  } else {
+    skip.row <- as.data.frame(
+      matrix(data = "...", ncol = ncol(df))
+    )
+    row.names(skip.row) <- glue::glue("(skip {nrow(df)-2*n} rows)")
+    names(skip.row) <- names(df)
+
+    rbind(head(df, n), skip.row, tail(df, n))
+  }
+}
+
 sum_table <- function(df, x, y, sum = TRUE, ...) {
   # output a data.frame table with total count of each unique x by y (column)
 
