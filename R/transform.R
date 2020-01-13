@@ -2,14 +2,18 @@
 
 # Transform -----------------------------------------------------------------------------------
 
+#' Trim leading and trailing white spaces
+#'
+#' By default, trim both leading and traling white spaces unless specified
+#' @param x a character
+#' @param all a boolean, trim non-leading/trailing white spaces as well if equals TRUE
+#' @param replacement a character to replace non-leading/trailing white spaces with
+
 trim_spaces <- function(x,
                         leading = FALSE,
                         trailing = FALSE,
                         all = FALSE,
                         replacement = "_") {
-  #'trim leading / trailing by default
-  #'trim in between white spaces if 'all == TRUE'
-  #'reduce white spaces to single separaters specified with 'replacement = '
 
   if (leading == FALSE &&
       trailing == FALSE) {
@@ -33,9 +37,32 @@ trim_spaces <- function(x,
 
 }
 
+
+#' Insert NAs randomly to a data.frame
+#'
+#' @param df a data frame
+#' @param percent percent of NAs per column
+#' @return a data frame
+#' @example
+#' foo <- insert_nas(mtcars, percent = 0.1)
+
+insert_nas <- function(df, percent = 0.2) {
+  as.data.frame(lapply(df, function(x) {
+    "is.na<-"(x, sample(seq(x), floor(length(x) * runif(1, 0, percent))))
+  })
+    )
+}
+
+#' Move column to far left hand side
+#'
+#' Accept multiple columns if passed in a character vector containing column names
+#' @param df a data frame
+#' @param str column name(s)
+#' @examples
+#' View(move_left(mtcars, "wt"))
+#' View(move_left(mtcars, c("gear", "carb", "wt")))
+
 move_left <- function(df, str) {
-  #' take col name or RE and move them to far left
-  #' accept multiple column names passed in as character vectors
 
   if (length(str) == 1) {
     col_idx <- grep(str, names(df))
@@ -98,13 +125,14 @@ subset_by_quantile <- function(df,
 
 # Data Processing
 
+#' Join x, y data frames by appending y values to x if missing (for columns of same names)
+
 coalesce_join <- function(x,
                           y,
                           by = NULL,
                           suffix = c(".x", ".y"),
                           join = dplyr::left_join,
                           ...) {
-  #join x, y data frames by appending y values to x if missing
 
   x <- x %>%
     select(-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
@@ -134,11 +162,9 @@ coalesce_join <- function(x,
   dplyr::bind_cols(joined, coalesced)[cols]
 }
 
-
-# Not yet commited
+#' Append empty rows to a dataframe to make row number = n
 
 add_empty_rows <- function(df, n) {
-  # append empty rows to a dataframe to make row number = n
 
   new.row <- rep(NA, length = ncol(df))
   new.row <- rbind(new.row)
@@ -149,17 +175,23 @@ add_empty_rows <- function(df, n) {
   new.df <- rbind(df, to.append, use.names = FALSE)
 }
 
+#' Convert time related columns to character
+#'
+#' background: POSIXct datetime format when output as csv will not be read corretly with JMP \cr
+#' purpose: convert all time columns to character format befor exporting to csv \cr
+#' note: accept regex if default rule of selecting columns containing "time" is not ideal \cr
+#'
+#' @param df a data frame
+#' @param regex a regular expression character vector, to be used for matching to 'time' columns
+
 convert_time_to_chr <- function(df, regex = "Time") {
-  #' background: POSIXct datetime format when output as csv will not be read corretly with JMP
-  #' purpose: convert all time columns to character format befor exporting to csv
-  #' note: accept regex if default rule of selecting columns containing "time" is not ideal
 
   df %>% dplyr::mutate_at(vars(contains(!!regex)), as.character)
 }
 
+#' Remove column(s) if containing a single unique value
 
 rm_single_unique_col <- function(df) {
-  #'remove columns if contain single unique value
 
   foo <- sapply(df, function(x) {
     length(unique(x))

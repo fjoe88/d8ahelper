@@ -1,10 +1,14 @@
 
-
-
 # Summarize ---------------------------------------------------------------------------------
 
+#' quick glance into a dataframe combining n head and tail rows
+#'
+#' @param n number of top/bottom rows to include
+#' @return top, bottom and a transition rows suggest how many rows skipped
+#' @examples
+#' headtail(mtcars)
+
 headtail <- function(df, n = 5) {
-  #' combine head and tail to show first and last n rows of dataframe
 
   if (nrow(df) <= 2*n) {
     head(df, nrow(df))
@@ -19,8 +23,15 @@ headtail <- function(df, n = 5) {
   }
 }
 
+#' Given 2 columns, summarize counts of each unique value-pair combinations
+#'
+#' @param x a column #, unique values displayed as row headers
+#' @param y a column #, unique values displayed as column headers
+#' @return a data frame
+#' @example
+#' sum_table(ToothGrowth, x = "supp", y = "dose")
+
 sum_table <- function(df, x, y, sum = TRUE, ...) {
-  # output a data.frame table with total count of each unique x by y (column)
 
   if (!is.character(x) &&
       is.character(y))
@@ -37,12 +48,19 @@ sum_table <- function(df, x, y, sum = TRUE, ...) {
   }
 }
 
+#' Summarize a data frame with some useful summary statistics
+#'
+#' @param df a data frame
+#' @param outlier_method "z" (Normal) or "mad" (Nonparametric) for how to categorize outliers
+#' @param thres a number to suggest number of standard deviations to use for categorize outliers
+#' @return a data frame
+#' @example
+#' View(sum_col(iris))
+
 sum_col <- function(df,
                     outlier_method = "z",
                     thres = 3,
-                    summary_split = FALSE,
                     ...) {
-  # returns a dataframe that summarize the input data table
 
   if (!is.data.frame(df))
     stop("Only data.frame object is accepted")
@@ -124,13 +142,20 @@ sum_col <- function(df,
   )
 }
 
+#' give top n missing value column combinations
+#'
+#' @param df a data frame
+#' @param num top n number of missing rows to return
+#' @example
+#' foo <- d8ahelper::insert_nas(mtcars) #generate missing values for each row
+#' View(sum_missing(foo))
+
 sum_missing <- function(df, num = 5, ...) {
-  #give top n missing value column combinations
 
   df[!is.na(df)] <- 0
   df[is.na(df)] <- 1
 
-  df_foo <- as_tibble(sapply(df, as.character)) %>%
+  df_missing <- as_tibble(sapply(df, as.character)) %>%
     unite("id", colnames(.), sep = "") %>%
     group_by(id) %>%
     summarise(n = n()) %>%
@@ -141,4 +166,6 @@ sum_missing <- function(df, num = 5, ...) {
       "position" = paste0(which(strsplit(id, "")[[1]] == "1"), collapse = ","),
       "colname" = paste0(names(df)[which(strsplit(id, "")[[1]] == "1")], collapse = ",")
     )
+
+  df_missing <- move_left(df_missing, "colname")
 }
