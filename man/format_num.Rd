@@ -2,12 +2,10 @@
 % Please edit documentation in R/formatting.R
 \name{format_num}
 \alias{format_num}
-\title{trim numbers to 2 digit after decimal point format
-accept number vectors or data.frame}
+\title{Trim numbers to 2 digit after decimal point format}
 \usage{
 format_num(num, digits = 2, ...)
 }
 \description{
-trim numbers to 2 digit after decimal point format
-accept number vectors or data.frame
+Accept numerical vectors, or data.frame
 }

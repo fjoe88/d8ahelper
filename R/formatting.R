@@ -1,22 +1,26 @@
-#' Helper functions for general data processing at IM Flash.
-
 
 # Formatting ----------------------------------------------------------------------------------
 
+#' Convert integer/floating point number format to 'dd.dd%' percentage format
+#'
+#' @param x a number
+#' @param digits the desired number of digits after the decimal point
+#' @param format default to "f" which gives numbers in the usual xxx.xxx format. see help(formatC)
 
 format_to_percentage <- function(x,
                                  digits = 2,
                                  format = "f",
                                  ...) {
-  #'given a integer/floating point number, convert to 'dd.dd%' percentageformat
 
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
+#' Trim numbers to 2 digit after decimal point format
+#'
+#' Accept numerical vectors, or data.frame
+
 format_num <-
   function(num, digits = 2, ...) {
-    #' trim numbers to 2 digit after decimal point format
-    #' accept number vectors or data.frame
 
     if (is.data.frame(num)) {
       is.num <- sapply(num, is.numeric)
@@ -28,6 +32,15 @@ format_num <-
       as.double(format(round(as.numeric(num), digits), nsmall = digits))
     }
   }
+
+#' Format datetime columns to a specified format
+#'
+#' @param df a data frame
+#' @param regex a character used for regular expression lookup of matching columns to format with
+#' @param timeformat datetime format to be used for formating columns with (see 'help(strptime)')
+#'
+#' @example
+#' format_datetime(df, "datetime", timeformat = "%m/%d/%Y %H:%M:%S %p")
 
 format_datetime <- function(df, regex, timeformat, ...) {
   if (is.data.frame(df)) {

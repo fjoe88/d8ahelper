@@ -2,12 +2,17 @@
 % Please edit documentation in R/formatting.R
 \name{format_to_percentage}
 \alias{format_to_percentage}
-\title{Helper functions for general data processing at IM Flash.
-given a integer/floating point number, convert to 'dd.dd%' percentageformat}
+\title{Convert integer/floating point number format to 'dd.dd%' percentage format}
 \usage{
 format_to_percentage(x, digits = 2, format = "f", ...)
 }
+\arguments{
+\item{x}{a number}
+
+\item{digits}{the desired number of digits after the decimal point}
+
+\item{format}{default to "f" which gives numbers in the usual xxx.xxx format. see help(formatC)}
+}
 \description{
-Helper functions for general data processing at IM Flash.
-given a integer/floating point number, convert to 'dd.dd%' percentageformat
+Convert integer/floating point number format to 'dd.dd%' percentage format
 }
