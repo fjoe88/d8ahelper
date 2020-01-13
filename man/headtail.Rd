@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize.R
 \name{headtail}
 \alias{headtail}
-\title{quick glance into a dataframe combining n head and tail rows}
+\title{A quick glance into a dataframe combining n head and tail rows}
 \usage{
 headtail(df, n = 5)
 }
@@ -13,7 +13,7 @@ headtail(df, n = 5)
 top, bottom and a transition rows suggest how many rows skipped
 }
 \description{
-quick glance into a dataframe combining n head and tail rows
+A quick glance into a dataframe combining n head and tail rows
 }
 \examples{
 headtail(mtcars)

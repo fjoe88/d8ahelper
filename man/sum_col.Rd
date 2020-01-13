@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize.R
 \name{sum_col}
 \alias{sum_col}
-\title{Summarize a data frame with some useful summary statistics}
+\title{Summarize a data frame with concise and useful summary statistics}
 \usage{
 sum_col(df, outlier_method = "z", thres = 3, ...)
 }
@@ -17,5 +17,5 @@ sum_col(df, outlier_method = "z", thres = 3, ...)
 a data frame
 }
 \description{
-Summarize a data frame with some useful summary statistics
+Summarize a data frame with concise and useful summary statistics
 }

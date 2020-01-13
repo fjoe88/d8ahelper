@@ -1,7 +1,7 @@
 
 # Summarize ---------------------------------------------------------------------------------
 
-#' quick glance into a dataframe combining n head and tail rows
+#' A quick glance into a dataframe combining n head and tail rows
 #'
 #' @param n number of top/bottom rows to include
 #' @return top, bottom and a transition rows suggest how many rows skipped
@@ -48,7 +48,7 @@ sum_table <- function(df, x, y, sum = TRUE, ...) {
   }
 }
 
-#' Summarize a data frame with some useful summary statistics
+#' Summarize a data frame with concise and useful summary statistics
 #'
 #' @param df a data frame
 #' @param outlier_method "z" (Normal) or "mad" (Nonparametric) for how to categorize outliers
@@ -142,7 +142,7 @@ sum_col <- function(df,
   )
 }
 
-#' give top n missing value column combinations
+#' Summary statistics of top n missing value columns
 #'
 #' @param df a data frame
 #' @param num top n number of missing rows to return

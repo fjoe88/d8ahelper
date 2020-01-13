@@ -2,7 +2,7 @@
 % Please edit documentation in R/summarize.R
 \name{sum_missing}
 \alias{sum_missing}
-\title{give top n missing value column combinations}
+\title{Summary statistics of top n missing value columns}
 \usage{
 sum_missing(df, num = 5, ...)
 }
@@ -12,5 +12,5 @@ sum_missing(df, num = 5, ...)
 \item{num}{top n number of missing rows to return}
 }
 \description{
-give top n missing value column combinations
+Summary statistics of top n missing value columns
 }
