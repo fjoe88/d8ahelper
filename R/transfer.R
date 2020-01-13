@@ -8,6 +8,7 @@ copy_unique <-
            sep = ",",
            quotes = FALSE,
            format_lotid = TRUE,
+           format_step = FALSE,
            save_csv = FALSE,
            ...) {
     #'copy unique values to clipboard.
@@ -21,7 +22,8 @@ copy_unique <-
     #'note:
     #'1) if input is a dataframe, do not return back a df.
     #'2) by default will assume lotids being copied and format them unless set format_lotid = FALSE
-    #'3) if save_csv == TRUE, will save output to '1.lot_list.csv'
+    #'3) if format_step == TRUE, return a comma separated step name string instead
+    #'4) if save_csv == TRUE, will save output to '1.lot_list.csv'
 
     if (is.data.frame(df)) {
       if (tolower(col) == "lotid") {
@@ -39,6 +41,14 @@ copy_unique <-
 
       if (length(df) > 1) {
         df = paste(df, collapse = ",")
+      }
+      # early return
+      if (format_step == TRUE){
+        dt <- data.table::setDT(stringr::str_split(df, ","))
+        names(dt) <- "step_name"
+        dt <- unique(dt)
+        utils::writeClipboard(paste(dt[["step_name"]], collapse = ","))
+        return(dt)
       }
 
       df <-
@@ -69,7 +79,7 @@ copy_unique <-
       utils::writeClipboard(paste(dt[[col]], collapse = sep))
 
       if (save_csv == TRUE) {
-        d8ahelper::save_csv(dt, name = "1.lot_list.csv")
+        d8ahelper::save_csv(dt, file.name = "1.lot_list.csv")
       }
 
       return(dt)
@@ -79,7 +89,9 @@ copy_unique <-
 copy_as_sql_like <-
   function(x = paste(readClipboard(), collapse = ","),
            is_lotid = TRUE,
-           col = "lot_id") {
+           col = "lot_id",
+           add_and_prior = FALSE,
+           add_and_post = FALSE) {
     #' provide quick sql-friendly format string to fuzzy match a list of (lotids)
 
     if (is_lotid == TRUE) {
@@ -99,21 +111,28 @@ copy_as_sql_like <-
                                "%'")
     }
 
+    if (add_and_prior == TRUE) {
+      lotid.sql.like <- paste("AND ", lotid.sql.like)
+    }
+
+    if (add_and_post == TRUE) {
+      lotid.sql.like <- paste(lotid.sql.like, " AND ")
+    }
+
     return(lotid.sql.like)
   }
 
 save_csv <- function(df,
                      time_as_chr = FALSE,
-                     path = 'C:/Users/zhoufang/OneDrive - Micron Technology, Inc/5_Raw_Data/standard_r_output/',
-                     name = "0.rOutput.csv",
+                     path = here::here("R_output"),
+                     file.name = "R_output.csv",
                      folder = "") {
   #' faster way of saving csv to a target folder
+  #' utilizes 'here' package to save output to 'R_output' folder under root directory by default
 
   if (time_as_chr == TRUE) {
     df <- d8ahelper::convert_time_to_chr(df)
   }
-
-  file.name <- name
 
   dir.create(file.path(path,
                        folder),
@@ -126,11 +145,12 @@ save_csv <- function(df,
 }
 
 
-load_csv <- function(name = '0.rOutput.csv',
-                     path = 'C:/Users/zhoufang/OneDrive - Micron Technology, Inc/5_Raw_Data/standard_r_output/',
+load_csv <- function(file.name = 'R_output.csv',
+                     path = here::here("R_output"),
                      folder = "",
                      load = TRUE) {
   #' load csv from a target folder
+  #' utilizes 'here' package to load files from to 'R_output' folder under root directory by default
   #'
   #' note:
   #' if load == FALSE, print csv file names to console only
@@ -144,6 +164,6 @@ load_csv <- function(name = '0.rOutput.csv',
 
     data.table::fread(file = file.path(path,
                                        folder,
-                                       name))
+                                       file.name))
   }
 }
