@@ -177,3 +177,75 @@ load_csv <- function(file.name = 'R_output.csv',
                                        file.name))
   }
 }
+
+
+# Encryption ----------------------------------------------------------------------------------
+
+#' A wrapper function for generating, store, and read key
+#' @example
+#' key <- gen_key(folder = "folde_where_key_is_stored")
+
+gen_key <- function(folder = "",
+                    key.wrap = TRUE) {
+
+
+  if (!file.exists(here::here(folder, ".key"))){
+    key <- sodium::keygen()
+    saveRDS(key, file = here::here(folder, ".key"), compress = FALSE)
+    return(key)
+  } else {
+    key <- readRDS(file = here::here(folder, ".key"))
+  }
+
+  if (key.wrap == TRUE) {
+    key <- cyphr::key_sodium(key)
+  } else {key}
+}
+
+#' A wrapper function for encrypting/delete file using key
+#' @example
+#' d8ahelper::save_csv(iris, file.name = "iris.csv")
+#' d8ahelper::encrypt("iris.csv", "iris_locked.csv")
+#' d8ahelper::decrypt("iris_locked.csv", "iris_unlocked.csv")
+
+encrypt <- function(file,
+                    dest,
+                    key = gen_key(),
+                    folder = "R_output",
+                    keep.original = FALSE) {
+
+  file.path = here::here(folder, file)
+  dest.path = here::here(folder, dest)
+
+  cyphr::encrypt_file(path = file.path,
+                      key = key,
+                      dest = dest.path)
+
+  if (keep.original == FALSE && file.exists(file.path)) {
+    unlink(file.path)
+  }
+}
+
+#' A wrapper function for decrypting/delete file using key
+#' @example
+#' d8ahelper::save_csv(iris, file.name = "iris.csv")
+#' d8ahelper::encrypt("iris.csv", "iris_locked.csv")
+#' d8ahelper::decrypt("iris_locked.csv", "iris_unlocked.csv")
+
+decrypt <- function(file,
+                    dest,
+                    key = gen_key(),
+                    folder = "R_output",
+                    keep.original = FALSE) {
+
+  file.path = here::here(folder, file)
+  dest.path = here::here(folder, dest)
+
+  cyphr::decrypt_file(path = file.path,
+                      key = key,
+                      dest = dest.path)
+
+  if (keep.original == FALSE && file.exists(file.path)) {
+    unlink(file.path)
+  }
+}
