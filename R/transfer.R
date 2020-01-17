@@ -185,16 +185,16 @@ load_csv <- function(file.name = 'R_output.csv',
 #' @example
 #' key <- gen_key(folder = "folde_where_key_is_stored")
 
-gen_key <- function(folder = "",
+gen_key <- function(file = ".key",
                     key.wrap = TRUE) {
 
 
-  if (!file.exists(here::here(folder, ".key"))){
+  if (!file.exists(here::here(file))){
     key <- sodium::keygen()
-    saveRDS(key, file = here::here(folder, ".key"), compress = FALSE)
+    saveRDS(key, file = here::here(file), compress = FALSE)
     return(key)
   } else {
-    key <- readRDS(file = here::here(folder, ".key"))
+    key <- readRDS(file = here::here(file))
   }
 
   if (key.wrap == TRUE) {
@@ -211,11 +211,10 @@ gen_key <- function(folder = "",
 encrypt <- function(file,
                     dest,
                     key = gen_key(),
-                    folder = "R_output",
                     keep.original = FALSE) {
 
-  file.path = here::here(folder, file)
-  dest.path = here::here(folder, dest)
+  file.path = here::here(file)
+  dest.path = here::here(dest)
 
   cyphr::encrypt_file(path = file.path,
                       key = key,
@@ -235,11 +234,10 @@ encrypt <- function(file,
 decrypt <- function(file,
                     dest,
                     key = gen_key(),
-                    folder = "R_output",
                     keep.original = FALSE) {
 
-  file.path = here::here(folder, file)
-  dest.path = here::here(folder, dest)
+  file.path = here::here(file)
+  dest.path = here::here(dest)
 
   cyphr::decrypt_file(path = file.path,
                       key = key,
@@ -248,4 +246,25 @@ decrypt <- function(file,
   if (keep.original == FALSE && file.exists(file.path)) {
     unlink(file.path)
   }
+}
+
+#' A wrapper function for the workflow of decryption, source and encryption of a '.R' file
+
+open_encrypted <- function(file,
+                           encrypted_file,
+                           encrypt_file = FALSE) {
+
+  if (file.exists(file) && encrypt_file == FALSE) {
+    stop("decrypted file already exists")
+  } else if (file.exists(file) && encrypt_file == TRUE) {
+    d8ahelper::encrypt(file, encrypted_file)
+  }
+
+  d8ahelper::decrypt(file = encrypted_file,
+                     dest = file)
+
+  source(here::here(file))
+
+  d8ahelper::encrypt(file = file,
+                     dest = encrypted_file)
 }
