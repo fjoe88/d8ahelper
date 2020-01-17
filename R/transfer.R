@@ -1,4 +1,5 @@
 
+
 # Transfer ------------------------------------------------------------------------------------
 
 #'Copy unique values to clipboard.
@@ -27,8 +28,8 @@ copy_unique <-
 
     if (is.data.frame(df)) {
       if (tolower(col) == "lotid") {
-        df <- d8ahelper::format_lotid(df)
-        df <- d8ahelper::create_startlot(df)
+        df <- wafer::format_lotid(df)
+        df <- wafer::create_startlot(df)
       }
       unique.val <- unique(df[[col]])
       str.to.copy <- paste(unique.val, collapse = sep)
@@ -65,8 +66,8 @@ copy_unique <-
 
       if (format_lotid == TRUE) {
         names(dt) <- "lotid"
-        dt <- d8ahelper::format_lotid(dt)
-        dt <- d8ahelper::create_startlot(dt)
+        dt <- wafer::format_lotid(dt)
+        dt <- wafer::create_startlot(dt)
       }
 
       if (quotes == TRUE) {
@@ -132,9 +133,9 @@ copy_as_sql_like <-
 #' @param folder specify output folder under 'path'
 
 save_csv <- function(df,
-                     time_as_chr = FALSE,
-                     path = here::here("R_output"),
                      file.name = "R_output.csv",
+                     path = here::here("R_output"),
+                     time_as_chr = FALSE,
                      folder = "") {
 
   if (time_as_chr == TRUE) {

@@ -1,8 +1,8 @@
 # d8ahelpeR
 
-![d8ahelpeR](./IMAGES/logo.jpg)
-
 ###### A set of convenience functions around data manipulation (import/formatting/transform/summarize/visualize).
+
+![d8ahelpeR](./IMAGES/logo.jpg)
 
 ### [Formatting](https://github.com/fjoe88/d8ahelper/blob/master/R/formatting.R)
 
