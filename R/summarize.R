@@ -23,6 +23,53 @@ headtail <- function(df, n = 5) {
   }
 }
 
+#' Extract unique rows combinations and row counts
+#'
+#' if passing no column names, will display duplicated rows and remove them
+
+unique_row <- function(df, ...) {
+  if (missing(...)) {
+    print(names(df))
+    df1 <- unique(df[,])
+    df2 <- purrr::transpose(df1)
+
+    df3 <- purrr::transpose(df[,])
+
+    df4 <-
+      as.data.frame(sapply(df2, function(m) {
+        sum(sapply(df3, function(n)
+          identical(m, n)))
+      }))
+
+    names(df4) <- "count"
+    df5 <- cbind(df4, df1)
+    df6 <- df5[order(df5$count, decreasing = TRUE),]
+    df7 <- df6[which(df6$count > 1),]
+
+    print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
+    print(d8ahelper::headtail(df7))
+    print(glue::glue("Duplicated rows ({nrow(df)-nrow(df5)}) removed with row order preserved except for duplicated rows:"))
+    df5[, !(names(df5) == "count")]
+
+  } else {
+    df1 <- unique(df[, c(...)])
+    df2 <- purrr::transpose(df1)
+
+    df3 <- purrr::transpose(df[, c(...)])
+
+    df4 <-
+      as.data.frame(sapply(df2, function(m) {
+        sum(sapply(df3, function(n)
+          identical(m, n)))
+      }))
+
+    names(df4) <- "count"
+    df5 <- cbind(df4, df1)
+    df5 <- df5[order(df5$count, decreasing = TRUE),]
+    return(df5)
+  }
+}
+
 #' Given 2 columns, summarize counts of each unique value-pair combinations
 #'
 #' @param x a column #, unique values displayed as row headers
