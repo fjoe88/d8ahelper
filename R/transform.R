@@ -76,6 +76,58 @@ move_left <- function(df, str) {
   }
 }
 
+#' Remove duplicated rows of the original data frame, or a subset of if column names being passed in
+
+remove_duplicates <- function(df, ...) {
+  if (missing(...)) {
+    print(names(df))
+    df1 <- unique(df[,])
+    df2 <- purrr::transpose(df1)
+
+    df3 <- purrr::transpose(df[,])
+
+    df4 <-
+      as.data.frame(sapply(df2, function(m) {
+        sum(sapply(df3, function(n)
+          identical(m, n)))
+      }))
+
+    names(df4) <- "count"
+    df5 <- cbind(df4, df1)
+    df6 <- df5[order(df5$count, decreasing = TRUE),]
+    df7 <- df6[which(df6$count > 1),]
+
+    print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
+    print(d8ahelper::headtail(df7))
+    print(glue::glue("Output dataframe of {nrow(df5)} rows containing no duplicates"))
+    df5[, !(names(df5) == "count")]
+
+  } else {
+    df1 <- unique(df[, c(...)])
+    df2 <- purrr::transpose(df1)
+
+    df3 <- purrr::transpose(df[, c(...)])
+
+    df4 <-
+      as.data.frame(sapply(df2, function(m) {
+        sum(sapply(df3, function(n)
+          identical(m, n)))
+      }))
+
+    names(df4) <- "count"
+    df5 <- cbind(df4, df1)
+    df6 <- df5[order(df5$count, decreasing = TRUE),]
+
+    df7 <- df6[which(df6$count > 1),]
+
+    print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
+    print(d8ahelper::headtail(df7))
+    print(glue::glue("Output dataframe of {nrow(df5)} rows containing no duplicates"))
+    df5[, !(names(df5) == "count")]
+
+  }
+}
+
 
 add_datehour <- function(df, datecol = "trackedout", ...) {
   #generage Date and Hour column based on Datetime column

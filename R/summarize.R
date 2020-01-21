@@ -23,9 +23,7 @@ headtail <- function(df, n = 5) {
   }
 }
 
-#' Extract unique rows combinations and row counts
-#'
-#' if passing no column names, will display duplicated rows and remove them
+#' Extract unique rows combinations and show row counts
 
 unique_row <- function(df, ...) {
   if (missing(...)) {
@@ -43,13 +41,7 @@ unique_row <- function(df, ...) {
 
     names(df4) <- "count"
     df5 <- cbind(df4, df1)
-    df6 <- df5[order(df5$count, decreasing = TRUE),]
-    df7 <- df6[which(df6$count > 1),]
-
-    print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
-    print(d8ahelper::headtail(df7))
-    print(glue::glue("Duplicated rows ({nrow(df)-nrow(df5)}) removed with row order preserved except for duplicated rows:"))
-    df5[, !(names(df5) == "count")]
+    df5 <- df5[order(df5$count, decreasing = TRUE),]
 
   } else {
     df1 <- unique(df[, c(...)])
@@ -66,7 +58,6 @@ unique_row <- function(df, ...) {
     names(df4) <- "count"
     df5 <- cbind(df4, df1)
     df5 <- df5[order(df5$count, decreasing = TRUE),]
-    return(df5)
   }
 }
 
