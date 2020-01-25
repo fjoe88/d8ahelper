@@ -80,7 +80,7 @@ copy_unique <-
       utils::writeClipboard(paste(dt[[col]], collapse = sep))
 
       if (save_csv == TRUE) {
-        d8ahelper::save_csv(dt, file.name = "_lot_list.csv")
+        d8ahelper::save_csv(dt, file.name = "1.lot_list.csv")
       }
 
       return(dt)
@@ -124,9 +124,13 @@ copy_as_sql_like <-
     return(lotid.sql.like)
   }
 
+#' Wrapper function for convinient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
+
+from_excel <- function(header = TRUE) {
+  read.table(file = "clipboard", sep = "\t", header = header)
+}
+
 #' Fast way to output CSV files
-#'
-#' Will copy file path to clipboard for convinient file locate or remove (via unlink())
 #'
 #' @param df a data frame
 #' @param time_as_chr specify if to convert datetime columns to character before export
@@ -138,21 +142,7 @@ save_csv <- function(df,
                      file.name = "R_output.csv",
                      path = here::here("R_output"),
                      time_as_chr = FALSE,
-                     folder = "",
-                     overwrite = FALSE,
-                     ...) {
-
-  file = file.path(path,
-                   folder,
-                   file.name)
-
-  writeClipboard(glue::glue("'{file}'"))
-
-  if (file.exists(file) && overwrite == FALSE) stop(glue::glue("{file} already exists!"))
-
-  if (file.exists(file) && overwrite == TRUE) {
-    unlink(file)
-  }
+                     folder = "") {
 
   if (time_as_chr == TRUE) {
     df <- d8ahelper::convert_time_to_chr(df)
@@ -162,11 +152,10 @@ save_csv <- function(df,
                        folder),
              showWarnings = FALSE)
 
-
-
   data.table::fwrite(df,
-                     file = file,
-                     ...)
+                     file = file.path(path,
+                                      folder,
+                                      file.name))
 }
 
 
@@ -180,23 +169,18 @@ save_csv <- function(df,
 load_csv <- function(file.name = 'R_output.csv',
                      path = here::here("R_output"),
                      folder = "",
-                     load = TRUE,
-                     ...) {
+                     load = TRUE) {
 
   print(list.files(path, pattern = ".csv"))
-
-  file = file.path(path,
-                   folder,
-                   file.name)
-
-  writeClipboard(glue::glue("'{file}'"))
 
   if (load == TRUE) {
     dir.create(file.path(path,
                          folder),
                showWarnings = FALSE)
 
-    data.table::fread(file = file, ...)
+    data.table::fread(file = file.path(path,
+                                       folder,
+                                       file.name))
   }
 }
 
