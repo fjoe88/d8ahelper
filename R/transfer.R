@@ -80,7 +80,7 @@ copy_unique <-
       utils::writeClipboard(paste(dt[[col]], collapse = sep))
 
       if (save_csv == TRUE) {
-        d8ahelper::save_csv(dt, file.name = "_lot_list.csv")
+        d8ahelper::save_csv(dt, file.name = "lot_list.csv")
       }
 
       return(dt)
@@ -130,13 +130,13 @@ copy_as_sql_like <-
 #'
 #' @param df a data frame
 #' @param time_as_chr specify if to convert datetime columns to character before export
-#' @param path ouput folder, by default use 'R_output' folder under root directory
+#' @param path ouput folder, by default use 'r_output' folder under root directory
 #' @param file.name character name for output file name
 #' @param folder specify output folder under 'path'
 
 save_csv <- function(df,
-                     file.name = "R_output.csv",
-                     path = here::here("R_output"),
+                     file.name = "r_output.csv",
+                     path = here::here("r_output"),
                      time_as_chr = FALSE,
                      folder = "",
                      overwrite = FALSE,
@@ -173,12 +173,12 @@ save_csv <- function(df,
 #' Fast way to load CSV files
 #'
 #' @param file.name character name for output file name
-#' @param path target folder, by default use 'R_output' folder under root directory
+#' @param path target folder, by default use 'r_output' folder under root directory
 #' @param folder specify output folder under 'path'
 #' @param load a boolean value, if == "FALSE" then only print to console the existing files
 
-load_csv <- function(file.name = 'R_output.csv',
-                     path = here::here("R_output"),
+load_csv <- function(file.name = 'r_output.csv',
+                     path = here::here("r_output"),
                      folder = "",
                      load = TRUE,
                      ...) {
@@ -200,6 +200,11 @@ load_csv <- function(file.name = 'R_output.csv',
   }
 }
 
+#' Wrapper function for convinient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
+
+from_excel <- function(header = TRUE) {
+  read.table(file = "clipboard", sep = "\t", header = header)
+}
 
 # Encryption ----------------------------------------------------------------------------------
 
@@ -272,21 +277,21 @@ decrypt <- function(file,
 
 #' A wrapper function for the workflow of decryption, source and encryption of a '.R' file
 
-open_encrypted <- function(file,
-                           encrypted_file,
-                           encrypt_file = FALSE) {
+open_encrypted <- function(file_actual,
+                           file_encrypted,
+                           encrypt = FALSE) {
 
-  if (file.exists(file) && encrypt_file == FALSE) {
+  if (file.exists(file_actual) && encrypt == FALSE) {
     stop("decrypted file already exists")
-  } else if (file.exists(file) && encrypt_file == TRUE) {
-    d8ahelper::encrypt(file, encrypted_file)
+  } else if (file.exists(file_actual) && encrypt == TRUE) {
+    d8ahelper::encrypt(file_actual, file_encrypted)
   }
 
-  d8ahelper::decrypt(file = encrypted_file,
-                     dest = file)
+  d8ahelper::decrypt(file = file_encrypted,
+                     dest = file_actual)
 
-  source(here::here(file))
+  source(here::here(file_actual))
 
-  d8ahelper::encrypt(file = file,
-                     dest = encrypted_file)
+  d8ahelper::encrypt(file = file_actual,
+                     dest = file_encrypted)
 }

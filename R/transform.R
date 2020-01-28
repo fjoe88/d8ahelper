@@ -246,13 +246,13 @@ rm_single_unique_col <- function(df) {
 
   foo <- sapply(df, function(x) {
     length(unique(x))
-  }) # output a named integer vector
+  })
 
   col_removed <- paste(names(foo)[foo == 1], collapse = ", ")
 
-  message(glue(
-    "Columns removed bacause of containing single unique value: \n {col_removed}"
-  ))
+  if (any(foo == 1)) {
+    message(glue("columns removed from {names(df)}: {col_removed}"))
+  }
 
-  df.out <- df[, !foo == 1]
+  df[, !foo == 1]
 }
