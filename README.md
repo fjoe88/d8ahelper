@@ -13,6 +13,7 @@
 ### [Summarize](https://github.com/fjoe88/d8ahelper/blob/master/R/summarize.R)
 
 - `headtail`
+- `unique_row`
 - `sum_table`
 - `sum_col`
 - `sum_missing`
@@ -36,6 +37,10 @@
 - `copy_as_sql_like`
 - `save_csv`
 - `load_csv`
+- `gen_key`
+- `encrypt`
+- `decrypt`
+- `open_encrypted`
 
 ### [Visualize](https://github.com/fjoe88/d8ahelper/blob/master/R/visualize.R)
 
