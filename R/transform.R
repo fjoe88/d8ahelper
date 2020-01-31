@@ -242,17 +242,45 @@ convert_time_to_chr <- function(df, regex = "Time") {
 
 #' Remove column(s) if containing a single unique value
 
-rm_single_unique_col <- function(df) {
+rm_single_unique_col <- function(df,
+                                 threshold = 1) {
 
-  foo <- sapply(df, function(x) {
-    length(unique(x))
+  df1 <- df[grepl(pattern = "^startlot$|^startlotkey$|^fulllot$|^lotid$|^lot_id$|^waferid$|^alias$", tolower(names(df)))]
+  df2 <- df[!grepl(pattern = "^startlot$|^startlotkey$|^fulllot$|^lotid$|^lot_id$|^waferid$|^alias$", tolower(names(df)))]
+
+  uniq <- sapply(df2, function(x) {
+    length(unique(x[!is.na(x)]))
   })
 
-  col_removed <- paste(names(foo)[foo == 1], collapse = ", ")
+  cbind(df1, df2[, !uniq %in% c(0:threshold)])
+}
 
-  if (any(foo == 1)) {
-    message(glue("columns removed from {names(df)}: {col_removed}"))
+#' Remove row(s) if all values are NAs
+
+remove_empty_rows <- function(df) {
+  if (!is.data.frame(df)) stop("not a data frame")
+  df %>% filter(Reduce(`+`, lapply(., is.na)) != ncol(.))
+}
+
+#' Fill NAs with fillers
+
+fill_na_as_missing <- function(df,
+                               fill = "[missing]",
+                               convert_fct_to_chr = TRUE) {
+  if (!is.data.frame(df)) {
+    stop("only accept a data frame")
   }
 
-  df[, !foo == 1]
+  if (convert_fct_to_chr == TRUE) {
+    df[] <- lapply(df, function(col) {
+      if (is.factor(col)) {
+        col <- as.character(col)
+      } else{
+        col
+      }
+
+    })
+  }
+
+  dplyr::mutate_if(df, is.character, list(~ tidyr::replace_na(., fill)))
 }
