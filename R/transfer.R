@@ -26,6 +26,9 @@ copy_unique <-
            save_csv = FALSE,
            ...) {
 
+    if (!(is.character(df)|is.data.frame(df)))
+      stop("only data.frame objects or character vectors are accepted")
+
     if (is.data.frame(df)) {
       if (tolower(col) == "lotid") {
         df <- wafer::format_lotid(df)
@@ -37,20 +40,29 @@ copy_unique <-
       return(df)
 
     } else{
-      if (!is.character(df))
-        stop("only data.frame objects or character vectors are accepted")
+
+      # early return if to format step names
+      if (format_step == TRUE){
+        dt <- data.table::setDT(stringr::str_split(df, ","))
+        dt <- unique(dt)
+
+        col = "step"
+        names(dt) <- col
+
+        if (quotes == TRUE) {
+          str <- paste(paste0("'", dt[[col]], "'"), collapse = ",")
+        }
+
+        utils::writeClipboard(str)
+        return(dt)
+      }
 
       if (length(df) > 1) {
         df = paste(df, collapse = ",")
       }
-      # early return
-      if (format_step == TRUE){
-        dt <- data.table::setDT(stringr::str_split(df, ","))
-        names(dt) <- "step_name"
-        dt <- unique(dt)
-        utils::writeClipboard(paste(dt[["step_name"]], collapse = ","))
-        return(dt)
-        }
+
+      # early return if nothing copied
+      if (!grepl("[[:alnum:]]", df)) {return()}
 
       df <-
         stringr::str_replace_all(df, pattern = "\\s+", replacement = ",")
@@ -62,6 +74,7 @@ copy_unique <-
         stringr::str_replace_all(df, pattern = ",+", replacement = ",")
 
       dt <- data.table::setDT(stringr::str_split(df, ","))
+
       names(dt) <- col
 
       if (format_lotid == TRUE) {
@@ -87,6 +100,30 @@ copy_unique <-
     }
   }
 
+#' SQL friendly formating tp combine list of inputs
+
+copy_as_sql <-
+  function(x = paste(readClipboard(), collapse = ","),
+           load_csv = FALSE,
+           col = "step"
+           ) {
+    if (load_csv == TRUE) {
+      df <- load_csv("_step_list.csv")
+      str <- paste0("'", paste(df[[col]], sep = ","), "'", collapse = ", ")
+      return(str)
+    }
+
+    if (!is.data.frame(x)){
+      df <- d8ahelper::copy_unique(x,
+                                   format_step = TRUE,
+                                   quotes = TRUE)
+    } else if (is.data.frame(df)) {
+      if (length(df) > 1) {
+        df = paste(df[[col]], collapse = ",")
+      } else {df[[col]]}
+    }
+  }
+
 #' SQL friendly formating tp combine list of inputs with 'LIKE' clause
 
 copy_as_sql_like <-
@@ -94,7 +131,13 @@ copy_as_sql_like <-
            is_lotid = TRUE,
            col = "lot_id",
            add_and_prior = FALSE,
-           add_and_post = FALSE) {
+           add_and_post = FALSE,
+           load_csv = FALSE) {
+
+    if (load_csv == TRUE){
+      lot.list <- d8ahelper::load_csv("_lot_list.csv")
+      x = paste(lot.list$lotid, collapse = ",")
+    }
 
     if (is_lotid == TRUE) {
       df <- d8ahelper::copy_unique(x)
@@ -205,6 +248,57 @@ load_csv <- function(file.name = 'r_output.csv',
 from_excel <- function(header = TRUE) {
   read.table(file = "clipboard", sep = "\t", header = header)
 }
+
+#'  via @haozhu233 (on GitHub)
+#'  write fixed width format text file
+
+write_fwf = function(dt, file, width,
+                     justify = "l", replace_na = "NA") {
+  fct_col = which(sapply(dt, is.factor))
+  if (length(fct_col) > 0) {
+    for (i in fct_col) {
+      dt[,i] <- as.character(dt[,i])
+    }
+  }
+  dt[is.na(dt)] = replace_na
+  n_col = ncol(dt)
+  justify = unlist(strsplit(justify, ""))
+  justify = as.character(factor(justify, c("l", "r"), c("-", "")))
+  if (n_col != 1) {
+    if (length(width) == 1) width = rep(width, n_col)
+    if (length(justify) == 1) justify = rep(justify, n_col)
+  }
+  sptf_fmt = paste0(
+    paste0("%", justify, width, "s"), collapse = ""
+  )
+  tbl_content = do.call(sprintf, c(fmt = sptf_fmt, dt))
+  tbl_header = do.call(sprintf, c(list(sptf_fmt), names(dt)))
+  out = c(tbl_header, tbl_content)
+  writeLines(out, file)
+}
+
+#' wrapper function to data.table::fread to convert blank cells to NA at reading
+#' for some reason data.table::fread do not convert blank cell to NA even with na.string = ""
+#' see https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread
+
+fread2 <- function(file, ...) {
+  dt <- data.table::fread(file = file, ...)
+  dt[dt == ""] <- NA
+  dt
+}
+
+#' load files paths in specified location
+
+load_files <- function(loc,
+                       pattern = ".csv",
+                       avoid = "^_|archive",
+                       full.names = TRUE,
+                       ...) {
+  files <- list.files(loc, full.names = full.names, pattern = pattern, ...)
+  names(files) <- str_extract(list.files(loc, full.names = FALSE, , pattern = pattern), "^[^\\.]*")
+  files <- files[!grepl(avoid, names(files))]
+}
+
 
 # Encryption ----------------------------------------------------------------------------------
 
