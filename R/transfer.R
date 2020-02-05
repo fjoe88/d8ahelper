@@ -220,25 +220,29 @@ save_csv <- function(df,
 #' @param folder specify output folder under 'path'
 #' @param load a boolean value, if == "FALSE" then only print to console the existing files
 
-load_csv <- function(file.name = 'r_output.csv',
+load_csv <- function(file = 'r_output.csv',
                      path = here::here("r_output"),
                      folder = "",
+                     full_path = FALSE,
                      load = TRUE,
                      ...) {
+  if (load == FALSE){
+    print(list.files(path, pattern = ".csv"))
+  }
 
-  print(list.files(path, pattern = ".csv"))
-
-  file = file.path(path,
-                   folder,
-                   file.name)
-
-  writeClipboard(glue::glue("'{file}'"))
-
-  if (load == TRUE) {
+  if (full_path == TRUE) {
+    file = file
+  } else {
     dir.create(file.path(path,
                          folder),
                showWarnings = FALSE)
 
+    file = file.path(path,
+                     folder,
+                     file)
+  }
+
+  if (load == TRUE) {
     data.table::fread(file = file, ...)
   }
 }
@@ -293,10 +297,18 @@ load_files <- function(loc,
                        pattern = ".csv",
                        avoid = "^_|archive",
                        full.names = TRUE,
+                       load = FALSE,
                        ...) {
   files <- list.files(loc, full.names = full.names, pattern = pattern, ...)
   names(files) <- str_extract(list.files(loc, full.names = FALSE, , pattern = pattern), "^[^\\.]*")
   files <- files[!grepl(avoid, names(files))]
+
+  if (load == TRUE) {
+    file.list <- lapply(as.list(files), function(x) readr::read_csv(x, col_types = cols()))
+    return(file.list)
+  }
+
+  return(files)
 }
 
 

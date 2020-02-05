@@ -54,3 +54,105 @@ multiplot <-
       }
     }
   }
+
+
+plot_boxplot <-
+  function(num,
+           grp = NULL,
+           data = NULL,
+           anova = TRUE,
+           alpha = 0.05,
+           verbose = TRUE,
+           plot_only = TRUE,
+           ...) {
+    if (!is.null(grp)) {
+      formula = num ~ grp
+      if (anova) {
+        model = aov(formula, data = data)
+        pval = summary(model)[[1]][["Pr(>F)"]][[1]]
+      } else{
+        grp = as.factor(grp)#characters do not work
+        pval = kruskal.test(num, grp, data = data)$p.value
+      }
+
+      if (pval < alpha) {
+        phrase = glue::glue("significant (alpha = {alpha})")
+
+      } else{
+        phrase = glue::glue("NOT significant (alpha = {alpha})")
+      }
+
+      test = ifelse(anova,
+                    "(ANOVA)",
+                    "(Kruskal-Wallis)")
+
+      if (verbose) {
+        sub = paste("p-value=", round(pval, 4), " ", phrase, test)
+      }
+      else{
+        sub = ""
+      }
+    } else {
+      #if group == NULL
+      sub = ""
+      formula = num
+      pval = NA
+    }
+
+    res = boxplot(formula, sub = sub, ...)
+
+    res$pval = pval
+
+    y0 = c()
+    y1 = c()
+    y2 = c()
+
+    if (is.null(grp)) {
+      grp = 1
+      grps = 1
+      x0 = 1
+    } else{
+      grps = sort(unique(grp))
+
+      x0 = seq_len(length(grps))
+
+    }
+
+    for (k in grps) {
+
+      Xloc = num[grp == k]
+      y0 = c(y0, mean(Xloc) - qnorm(1 - alpha / 2) * sd(Xloc) / sqrt(length(Xloc)))
+      y1 = c(y1, mean(Xloc) + qnorm(1 - alpha / 2) * sd(Xloc) / sqrt(length(Xloc)))
+      y2 = c(y2, mean(Xloc))
+    }
+
+    arrows(
+      x0 = x0,
+      y0 = y0,
+      x1 = x0,
+      y1 = y2,
+      angle = 90,
+      code = 3,
+      lwd = 2,
+      col = "blue"
+    )
+
+    arrows(
+      x0 = x0,
+      y0 = y0,
+      x1 = x0,
+      y1 = y1,
+      angle = 90,
+      code = 3,
+      lwd = 2,
+      col = "red"
+    )
+
+    res$confint = rbind(y1, y2, y0)
+    row.names(res$confint) <- c("upper", "mean", "lower")
+    res$risk = alpha
+
+    if (plot_only == TRUE) {
+      return(invisible(res))
+    } else { return(res) }
+  }
