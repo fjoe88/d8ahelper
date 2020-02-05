@@ -28,7 +28,7 @@ headtail <- function(df, n = 5) {
       } else {
         head <- stringr::str_extract(x, paste0("^(.){", n, "}"))
         tail <- stringr::str_extract(x, paste0("(.){", n, "}$"))
-        paste(head, tail, sep = "...")
+        paste(head, tail, sep = " ... ")
       }
     })
 
