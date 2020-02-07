@@ -2,6 +2,9 @@
 
 # transform -----------------------------------------------------------------------------------
 
+#' simply remove NAs given a vector
+#'
+rm_na <- function(x) x[!is.na(x)]
 
 #' Trim leading and trailing white spaces
 #'
@@ -120,7 +123,7 @@ convert_time_to_chr <- function(df, regex = "Time") {
 }
 
 
-# data join -----------------------------------------------------------------------------------
+# join -----------------------------------------------------------------------------------
 
 #' Join x, y data frames
 #' for columns of same names, append y values to x if rows that are missing value
@@ -290,7 +293,7 @@ fill_missing_as_na <- function(df, pattern = "[missing]") {
 # column names --------------------------------------------------------------------------------
 
 
-convert_col_name <- function(df) {
+encode_col <- function(df) {
   #' replace column names with alpha-numeric sequences
   #' returns a named vector (of name-value pairs) for column name look-up
   #' returns a list
@@ -305,13 +308,16 @@ convert_col_name <- function(df) {
 
 }
 
-revert_col_name <- function(df) {
+decode_col <- function(df.list, df = df.list$df) {
   #' sister function to convert_col_name
   #' returns a data frame with original column names based on df$dict
+  #'
+  #' @param df.list: list object generated from d8ahelper::convert_col_name
+  #' @param df: data frame to convert names from, default to df within df.list
 
-  names(df$df) <- sapply(names(df$df), function(x)
-    df$tag[[x]])
-  df$df
+  names(df) <- sapply(names(df), function(x)
+    df.list$tag[[x]])
+  df
 }
 
 get_name <- function(df, ...) {
