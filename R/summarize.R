@@ -35,6 +35,24 @@ headtail <- function(df, n = 5) {
   }
 }
 
+#' get mode of a vector
+#'
+#' @example
+#' x <- c("a","d","a","b","a","c",NA,NA,NA,NA,NA)
+#' get_mode(x)
+#' get_mode(x, na.rm = FALSE)
+
+get_mode <- function(x, na.rm = TRUE) {
+  if (na.rm == TRUE) {
+    ux <- x[!is.na(x)]
+  } else {
+    ux <- unique(x)
+  }
+
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+
 #' Extract unique rows combinations and show row counts
 
 unique_row <- function(df, ...) {
@@ -131,15 +149,15 @@ sum_col <- function(df,
       percent <- ((length(x) - sum(is.na(x))) / length(x))
       d8ahelper::format_to_percentage(percent)
       }),
-    "examples(mean)" = sapply(df, function(x) {
+    "mean" = sapply(df, function(x) {
       if (!is.numeric(x)) {
-        unique(x[!is.na(x)])[1]
-
+        # unique(x[!is.na(x)])[1]
+        NA
       } else{
         as.double(format(round(mean(x, na.rm = TRUE), 1), nsmall = 1))
       }
     }),
-    "summary(min|1Q|med|3Q|max)" = sapply(df, function(x) {
+    "summary(min|1Q|med|3Q|max(if num) or examples(if chr))" = sapply(df, function(x) {
       if (!is.numeric(x)) {
         paste(unique(x[!is.na(x)])[1:min(10, length(unique(x)))], collapse = " | ")
       } else{
@@ -190,6 +208,31 @@ sum_col <- function(df,
       }
     })
   )
+}
+
+sum_row <- function(df) {
+  #'generate row-wise summary for missing and unique values
+  #'
+  data.frame(
+    "NAs" = apply(df, 1, function(x)
+      sum(is.na(x))),
+    "NA.Pct" = apply(df, 1, function(x)
+      d8ahelper::format_to_percentage(sum(is.na(x)) / length(x))),
+    "NA.Position" = apply(df, 1, function(x)
+      d8ahelper::headtail(paste(
+        which(is.na(x)), collapse = ","
+      ), n = 15)),
+    "UNIQs" = apply(df, 1, function(x)
+      length(unique(x)))
+  )
+}
+
+sum_df <- function(df){
+  #'sister function to sum_col and sum_row
+  #'returns a list
+  #'
+  list("col_summary" <- d8ahelper::sum_col(df),
+       "row_summary" <- d8ahelper::sum_row(df))
 }
 
 #' Summary statistics of top n missing value columns
