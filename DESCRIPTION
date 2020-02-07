@@ -1,18 +1,19 @@
 Package: d8ahelper
 Type: Package
-Title: Convinient data manipulation methods and boilerplate code
+Title: Convinience functions for helping with data manipulations
 Version: 0.1.0
-Author: Joe Fang
-Maintainer: Joe Fang <fjoe88@gmail.com>
-Description: A set of convenience functions around data manipulation (import/formatting/transform/summarize/visualize).
+Author: zhoufang
+Maintainer: Joe Fang <zhoufang@micron.com>
+Description: Convinience functions for helping with data manipulations    Package splits into modules of transfer, transform, summarize, formatting, visualize, modelling, and wafer (specific to semiconductor manufacturing)
 Encoding: UTF-8
 LazyData: true
+Depends: 
+    R (>= 3.2)
 Imports:
-    dplyr,
-    readr,
-    magrittr,
-    data.table,
     lubridate,
-    here,
-    glue
+    data.table,
+    tidyverse,
+    modelr,
+    glue,
+    here
 RoxygenNote: 6.1.1
