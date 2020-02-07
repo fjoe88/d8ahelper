@@ -65,6 +65,8 @@ plot_boxplot <-
            verbose = TRUE,
            plot_only = TRUE,
            ...) {
+    #' boxplot with confidence intervals and summary statistics such as p-val and risk
+
     if (!is.null(grp)) {
       formula = num ~ grp
       if (anova) {
