@@ -316,7 +316,7 @@ load_files <- function(loc,
 
 #' A wrapper function for generating, store, and read key
 #' @example
-#' key <- gen_key(folder = "folde_where_key_is_stored")
+#' key <- gen_key(folder = "folder_where_key_is_stored")
 
 gen_key <- function(file = ".key",
                     key.wrap = TRUE) {
