@@ -4,20 +4,20 @@
 \alias{save_csv}
 \title{Fast way to output CSV files}
 \usage{
-save_csv(df, time_as_chr = FALSE, path = here::here("R_output"),
-  file.name = "R_output.csv", folder = "")
+save_csv(df, file.name = "r_output.csv", path = here::here("r_output"),
+  time_as_chr = FALSE, folder = "", overwrite = FALSE, ...)
 }
 \arguments{
 \item{df}{a data frame}
 
-\item{time_as_chr}{specify if to convert datetime columns to character before export}
-
-\item{path}{ouput folder, by default use 'R_output' folder under root directory}
-
 \item{file.name}{character name for output file name}
+
+\item{path}{ouput folder, by default use 'r_output' folder under root directory}
+
+\item{time_as_chr}{specify if to convert datetime columns to character before export}
 
 \item{folder}{specify output folder under 'path'}
 }
 \description{
-Fast way to output CSV files
+Will copy file path to clipboard for convinient file locate or remove (via unlink())
 }

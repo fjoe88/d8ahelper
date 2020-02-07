@@ -2,11 +2,13 @@
 % Please edit documentation in R/transform.R
 \name{coalesce_join}
 \alias{coalesce_join}
-\title{Join x, y data frames by appending y values to x if missing (for columns of same names)}
+\title{Join x, y data frames
+for columns of same names, append y values to x if rows that are missing value}
 \usage{
 coalesce_join(x, y, by = NULL, suffix = c(".x", ".y"),
   join = dplyr::left_join, ...)
 }
 \description{
-Join x, y data frames by appending y values to x if missing (for columns of same names)
+Join x, y data frames
+for columns of same names, append y values to x if rows that are missing value
 }

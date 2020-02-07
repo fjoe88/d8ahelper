@@ -4,7 +4,7 @@
 \alias{rm_single_unique_col}
 \title{Remove column(s) if containing a single unique value}
 \usage{
-rm_single_unique_col(df)
+rm_single_unique_col(df, threshold = 1)
 }
 \description{
 Remove column(s) if containing a single unique value

@@ -4,17 +4,17 @@
 \alias{load_csv}
 \title{Fast way to load CSV files}
 \usage{
-load_csv(file.name = "R_output.csv", path = here::here("R_output"),
-  folder = "", load = TRUE)
+load_csv(file = "r_output.csv", path = here::here("r_output"),
+  folder = "", full_path = FALSE, load = TRUE, ...)
 }
 \arguments{
-\item{file.name}{character name for output file name}
-
-\item{path}{target folder, by default use 'R_output' folder under root directory}
+\item{path}{target folder, by default use 'r_output' folder under root directory}
 
 \item{folder}{specify output folder under 'path'}
 
 \item{load}{a boolean value, if == "FALSE" then only print to console the existing files}
+
+\item{file.name}{character name for output file name}
 }
 \description{
 Fast way to load CSV files

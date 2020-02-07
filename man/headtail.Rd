@@ -7,7 +7,7 @@
 headtail(df, n = 5)
 }
 \arguments{
-\item{n}{number of top/bottom rows to include}
+\item{n}{number of top/bottom rows to include, or number of characters in case of a string}
 }
 \value{
 top, bottom and a transition rows suggest how many rows skipped
@@ -17,4 +17,5 @@ A quick glance into a dataframe combining n head and tail rows
 }
 \examples{
 headtail(mtcars)
+headtail("I would like to make this a very long string in order to make my case")
 }

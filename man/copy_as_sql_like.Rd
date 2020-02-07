@@ -6,7 +6,7 @@
 \usage{
 copy_as_sql_like(x = paste(readClipboard(), collapse = ","),
   is_lotid = TRUE, col = "lot_id", add_and_prior = FALSE,
-  add_and_post = FALSE)
+  add_and_post = FALSE, load_csv = FALSE)
 }
 \description{
 SQL friendly formating tp combine list of inputs with 'LIKE' clause
