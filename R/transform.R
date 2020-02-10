@@ -50,16 +50,16 @@ trim_spaces <- function(x,
 #' View(move_left(mtcars, c("gear", "carb", "wt")))
 
 move_left <- function(df, str) {
-  if (length(str) == 1) {
-    col_idx <- grep(str, names(df))
-    df <- df[, c(col_idx, (1:ncol(df))[-col_idx])]
-  } else if (length(str) > 1) {
-    col_idx <- integer()
-    for (i in seq_along(str)) {
-      idx <- grep(str[i], names(df))
-      col_idx[i] <- idx
-    }
-    df <- df[, c(col_idx, (1:ncol(df))[-col_idx])]
+  if (all(str %in% names(df)) == TRUE){
+    col.indx.part1 <- sapply(seq_along(str), function(i) {
+      which(str[i] == names(df))
+    })
+
+    col.indx.part2 <- seq_len(ncol(df))[!seq_len(ncol(df)) %in% col.indx.part1]
+    df <- df[, c(col.indx.part1, col.indx.part2)]
+  } else {
+    message("column(s) names mismatch, return original data frame")
+    return(df)
   }
 }
 
