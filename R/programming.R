@@ -10,3 +10,15 @@ lapply_preserve_names <- function(list, fun){
     fun(obj)
   })
 }
+
+list.files2 <- function(path = readr::clipboard(), return_str = TRUE, ...) {
+  #' wraper function list.files to allow coppied windows path format containing '/'
+
+  path <- stringr::str_replace_all(path, "\\\\+", "/")
+
+  if(return_str == TRUE){
+    return(path)
+  } else {
+    list.files(path = path, ...)
+  }
+}
