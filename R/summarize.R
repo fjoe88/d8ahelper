@@ -53,6 +53,23 @@ get_mode <- function(x, na.rm = TRUE) {
 }
 
 
+#' function factory for nth quantile
+
+ff_quantile <- function(num){
+  function(x, ...) {
+    quantile(x, num, ...)
+  }
+}
+
+q5  <- ff_quantile(0.05)
+q10 <- ff_quantile(0.10)
+q25 <- ff_quantile(0.25)
+q50 <- ff_quantile(0.50)
+q75 <- ff_quantile(0.75)
+q90 <- ff_quantile(0.90)
+q95 <- ff_quantile(0.95)
+
+
 #' Extract unique rows combinations and show row counts
 
 unique_row <- function(df, ...) {
@@ -262,3 +279,5 @@ sum_missing <- function(df, num = 5, ...) {
 
   df_missing <- move_left(df_missing, "colname")
 }
+
+
