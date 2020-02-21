@@ -4,23 +4,24 @@
 # pre-processing ------------------------------------------------------------------------------
 
 filter_col_unique <- function(df,
-                              percentUnique = 50,
+                              percentUnique = 50, #TODO: figure out a proper ths
+                              levelsAtMost = 30,
                               freqRatio = 1,
                               breaks = 50,
                               useDefault = FALSE,
-                              plot = TRUE,
+                              quiet = FALSE,
                               simplify = FALSE) {
   #' wraper function to caret::nearZeroVar to filter chr columns for Zero- and Near Zero-Variance Predictors
   #'@param df a data frame
-  #'@param percentUnique a numeric for percentUnique threshold
-  #'@param freqRatio a numeric for freqRatio threshold
+  #'@param percentUnique a numeric for percentUnique threshold (distinct values to total number of  samples, default to cut off if above 50%)
+  #'@param freqRatio a numeric for freqRatio threshold (most common value to the second most common value, default to cut off if below 1)
   #'@param useDefault a logical for if to use caret default for removing near zero variance variables
   #'@param plot a logical for if to include histograms of percentUnique and freqRatio
   #'@param simplify a logical for if to simplify output to a single data frame, else return a list
 
   nzv <- caret::nearZeroVar(df, saveMetrics = TRUE)
 
-  if (plot == TRUE) {
+  if (quiet == FALSE) {
     hist(nzv$freqRatio, breaks = breaks)
     hist(nzv$percentUnique, breaks = breaks)
   }
@@ -30,6 +31,21 @@ filter_col_unique <- function(df,
     nzv <- nearZeroVar(df_data)
     return(df[, -nzv])
   }
+
+  # setup threshold for categorical column levels
+
+  nzv$levels <- sapply(df, function(x){
+    if (is.character(x)){
+      length(unique(x))
+    } else {
+      NA
+    }
+  })
+
+  df1 <-
+    df[, nzv$percentUnique < percentUnique &
+         nzv$levels < levelsAtMost &
+         nzv$freqRatio < freqRatio * nrow(df)]
 
   df1 <-
     df[, nzv$percentUnique < percentUnique & nzv$freqRatio < freqRatio * nrow(df)]
@@ -90,7 +106,8 @@ create_dummy <- function(df,
 }
 
 corr_to_df <- function(cor,
-                       level = 0.9) {
+                       level = 0.9 #TODO: figure out proper th
+                       ) {
   #' filter high corr features and output in tidy format
   #' input: corr matrix of numerical format
   #' output: a data frame
@@ -125,7 +142,7 @@ corr_to_df <- function(cor,
 
 remove_high_corr_features <-
   function(df,
-           level = 0.99,
+           level = 0.99, #TODO: figure out proper th
            simplify = FALSE) {
     #' wraper function ofcaret::findCorrelation: find and remove highly correlated features
     #'
@@ -139,7 +156,7 @@ remove_high_corr_features <-
     descrCor.df <- as.data.frame(descrCor)
 
     if (level == 1) {
-      result <- corr_to_df(descrCor, level = 1)
+      result <- d8ahelper::corr_to_df(descrCor, level = 1)
 
       col.to.remove <- which(names(df) %in% result$y)
       df <- df[, -col.to.remove]
@@ -157,9 +174,9 @@ remove_high_corr_features <-
     highlyCorDescr <-
       caret::findCorrelation(descrCor, cutoff = level) # col.id to remove
 
-    cor <- corr_to_df(descrCor.df[, -highlyCorDescr], level = level)
+    cor <- d8ahelper::corr_to_df(descrCor.df[, -highlyCorDescr], level = level)
     cor.removed <-
-      corr_to_df(descrCor.df[, highlyCorDescr], level = level)
+      d8ahelper::corr_to_df(descrCor.df[, highlyCorDescr], level = level)
 
     if (simplify == TRUE) {
       descrCor.df[, -highlyCorDescr]
