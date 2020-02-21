@@ -100,72 +100,6 @@ copy_unique <-
     }
   }
 
-#' SQL friendly formating tp combine list of inputs
-
-copy_as_sql <-
-  function(x = paste(readClipboard(), collapse = ","),
-           load_csv = FALSE,
-           col = "step"
-           ) {
-    if (load_csv == TRUE) {
-      df <- load_csv("_step_list.csv")
-      str <- paste0("'", paste(df[[col]], sep = ","), "'", collapse = ", ")
-      return(str)
-    }
-
-    if (!is.data.frame(x)){
-      df <- d8ahelper::copy_unique(x,
-                                   format_step = TRUE,
-                                   quotes = TRUE)
-    } else if (is.data.frame(df)) {
-      if (length(df) > 1) {
-        df = paste(df[[col]], collapse = ",")
-      } else {df[[col]]}
-    }
-  }
-
-#' SQL friendly formating tp combine list of inputs with 'LIKE' clause
-
-copy_as_sql_like <-
-  function(x = paste(readClipboard(), collapse = ","),
-           is_lotid = TRUE,
-           col = "lot_id",
-           add_and_prior = FALSE,
-           add_and_post = FALSE,
-           load_csv = FALSE) {
-
-    if (load_csv == TRUE){
-      lot.list <- d8ahelper::load_csv("_lot_list.csv")
-      x = paste(lot.list$lotid, collapse = ",")
-    }
-
-    if (is_lotid == TRUE) {
-      df <- d8ahelper::copy_unique(x)
-
-      lotid.sql.like <- paste0(glue::glue("{col} like '"),
-                               paste(df$StartLot,
-                                     collapse = glue::glue("%'  or {col} like '")),
-                               "%'")
-    } else {
-      df <- d8ahelper::copy_unique(x,
-                                   format_lotid = FALSE)
-
-      lotid.sql.like <- paste0(glue::glue("{col} like '"),
-                               paste(df$lotid,
-                                     collapse = glue::glue("%'  or {col} like '")),
-                               "%'")
-    }
-
-    if (add_and_prior == TRUE) {
-      lotid.sql.like <- paste("AND ", lotid.sql.like)
-    }
-
-    if (add_and_post == TRUE) {
-      lotid.sql.like <- paste(lotid.sql.like, " AND ")
-    }
-
-    return(lotid.sql.like)
-  }
 
 #' Fast way to output CSV files
 #'
@@ -183,13 +117,20 @@ save_csv <- function(df,
                      time_as_chr = FALSE,
                      folder = "",
                      overwrite = FALSE,
+                     use_readr = FALSE,
                      ...) {
+
+  dir.create(file.path(path),
+             showWarnings = FALSE)
+
+  if (folder != "") {
+    dir.create(file.path(path, folder),
+               showWarnings = FALSE)
+  }
 
   file = file.path(path,
                    folder,
                    file.name)
-
-  writeClipboard(glue::glue("'{file}'"))
 
   if (file.exists(file) && overwrite == FALSE) stop(glue::glue("{file} already exists!"))
 
@@ -201,16 +142,48 @@ save_csv <- function(df,
     df <- d8ahelper::convert_time_to_chr(df)
   }
 
-  dir.create(file.path(path,
-                       folder),
-             showWarnings = FALSE)
+  if (use_readr == FALSE){
+    data.table::fwrite(df,
+                       file = file,
+                       ...)
+  }
 
-
-
-  data.table::fwrite(df,
-                     file = file,
+  if (use_readr == TRUE){
+    readr::write_csv(df,
+                     path = file,
                      ...)
+  }
+
 }
+
+#' a wrapper function of save_csv that applies to a list of data frames
+
+save_csv_from_a_list <- function(lst, overwrite = FALSE, ...) {
+  if (!is.list(lst) || is.data.frame(lst)) {
+    obj <- deparse(match.call(expand.dots = TRUE)[-1][[1]])
+    stop(glue::glue("invalid argument: '{obj}' is not a list"))
+  }
+
+  i <- 1
+
+  for (i in seq_along(lst)) {
+    if (is.null(names(lst)[i])) {
+      named_as <- i
+      i <<- i + 1
+    }
+
+    if (!is.null(names(lst)[i])) {
+      named_as <- names(lst)[i]
+      i <<- i + 1
+    }
+
+    d8ahelper::save_csv(lst[[i]],
+                        file.name = glue::glue("{named_as}.csv"),
+                        overwrite = overwrite,
+                        ...)
+  }
+}
+
 
 
 #' Fast way to load CSV files
@@ -226,23 +199,23 @@ load_csv <- function(file = 'r_output.csv',
                      full_path = FALSE,
                      load = TRUE,
                      ...) {
-  if (load == FALSE){
+  if (load == FALSE) {
     print(list.files(path, pattern = ".csv"))
   }
 
-  if (full_path == TRUE) {
-    file = file
-  } else {
-    dir.create(file.path(path,
-                         folder),
-               showWarnings = FALSE)
-
-    file = file.path(path,
-                     folder,
-                     file)
-  }
-
   if (load == TRUE) {
+    if (full_path == TRUE) {
+      file = file
+    } else {
+      dir.create(file.path(path,
+                           folder),
+                 showWarnings = FALSE)
+
+      file = file.path(path,
+                       folder,
+                       file)
+    }
+
     data.table::fread(file = file, ...)
   }
 }
@@ -295,17 +268,36 @@ fread2 <- function(file, ...) {
 
 load_files <- function(loc,
                        pattern = ".csv",
+                       read_as_df = TRUE,
                        avoid = "^_|archive",
                        full.names = TRUE,
                        load = FALSE,
                        ...) {
-  files <- list.files(loc, full.names = full.names, pattern = pattern, ...)
-  names(files) <- str_extract(list.files(loc, full.names = FALSE, , pattern = pattern), "^[^\\.]*")
+  #'
+  #' @param load a logical for if actually read the files; if pattern is not ".csv", then read as text
+  #' @param read_as_df a logical, if to read as data frame, else read as text
+
+  files <-
+    list.files(loc, full.names = full.names, pattern = pattern, ...)
+  names(files) <-
+    str_extract(list.files(loc, full.names = FALSE, , pattern = pattern),
+                "^[^\\.]*")
   files <- files[!grepl(avoid, names(files))]
 
   if (load == TRUE) {
-    file.list <- lapply(as.list(files), function(x) readr::read_csv(x, col_types = cols()))
-    return(file.list)
+    if (read_as_df == TRUE) {
+      file.list <-
+        lapply(as.list(files), function(x)
+          readr::read_csv(x, col_types = cols()))
+      return(file.list)
+    }
+
+    if (read_as_df == FALSE) {
+      file.list <-
+        lapply(as.list(files), function(x)
+          readtext::readtext(file = x, verbosity = FALSE)$text)
+      return(file.list)
+    }
   }
 
   return(files)
