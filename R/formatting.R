@@ -1,7 +1,7 @@
 
 # Formatting ----------------------------------------------------------------------------------
 
-#' Convert integer/floating point number format to 'dd.dd%' percentage format
+#' Convert integer/floating point number format to percentage format
 #'
 #' @param x a number
 #' @param digits the desired number of digits after the decimal point

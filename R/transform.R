@@ -116,10 +116,11 @@ subset_by_quantile <- function(df,
 #' note: accept regex if default rule of selecting columns containing "time" is not ideal \cr
 #'
 #' @param df a data frame
-#' @param regex a regular expression character vector, to be used for matching to 'time' columns
+#' @param regex a regular expression character vector, to be used for matching to time column names
+#' @example df <- convert_time_to_chr(df, re = "time|datetime|trackedout")
 
-convert_time_to_chr <- function(df, regex = "Time") {
-  df %>% dplyr::mutate_at(vars(contains(!!regex)), as.character)
+convert_time_to_chr <- function(df, re = "datetime") {
+  df %>% dplyr::mutate_at(vars(matches(!!re)), as.character)
 }
 
 
@@ -286,7 +287,7 @@ fill_na_as_missing <- function(df,
 fill_missing_as_na <- function(df, pattern = "[missing]") {
   #' sister function to fill_na_as_missing
 
-  df[df == "[missing]"] <- NA
+  df[df == pattern] <- NA
   df
 }
 
@@ -372,6 +373,8 @@ str_find <- function(str,
 
 
 #' Append empty rows to a dataframe to make row number = n
+#'
+#' @param n a numeric, the number of rows of the outcome table after filling missing rows
 
 add_empty_rows <- function(df, n) {
   new.row <- rep(NA, length = ncol(df))
