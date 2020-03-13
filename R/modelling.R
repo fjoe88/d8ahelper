@@ -5,7 +5,7 @@
 
 filter_col_unique <- function(df,
                               percentUnique = 50, #TODO: figure out a proper ths
-                              levelsAtMost = 30,
+                              levelsAtMost = 20,
                               freqRatio = 1,
                               breaks = 50,
                               useDefault = FALSE,
@@ -13,7 +13,7 @@ filter_col_unique <- function(df,
                               simplify = FALSE) {
   #' wraper function to caret::nearZeroVar to filter chr columns for Zero- and Near Zero-Variance Predictors
   #'@param df a data frame
-  #'@param percentUnique a numeric for percentUnique threshold (distinct values to total number of  samples, default to cut off if above 50%)
+  #'@param percentUnique a numeric for percentUnique threshold, distinct values to total number of  samples, default to cut off if above 50percent.
   #'@param freqRatio a numeric for freqRatio threshold (most common value to the second most common value, default to cut off if below 1)
   #'@param useDefault a logical for if to use caret default for removing near zero variance variables
   #'@param plot a logical for if to include histograms of percentUnique and freqRatio
@@ -47,10 +47,9 @@ filter_col_unique <- function(df,
          nzv$levels < levelsAtMost &
          nzv$freqRatio < freqRatio * nrow(df)]
 
-  df1 <-
-    df[, nzv$percentUnique < percentUnique & nzv$freqRatio < freqRatio * nrow(df)]
-
-  df2 <- df[, !(nzv$percentUnique < percentUnique & nzv$freqRatio < freqRatio * nrow(df))]
+  df2 <- df[, !(nzv$percentUnique < percentUnique &
+                nzv$levels < levelsAtMost &
+                nzv$freqRatio < freqRatio * nrow(df))]
 
 
   if (simplify == TRUE) {return(df1)
