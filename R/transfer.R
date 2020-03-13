@@ -120,6 +120,8 @@ save_csv <- function(df,
                      use_readr = FALSE,
                      ...) {
 
+  if (!is.data.frame(df)) return(NA)
+
   dir.create(file.path(path),
              showWarnings = FALSE)
 
@@ -158,29 +160,28 @@ save_csv <- function(df,
 
 #' a wrapper function of save_csv that applies to a list of data frames
 
-save_csv_from_a_list <- function(lst, overwrite = FALSE, ...) {
+save_csv_from_a_list <- function(lst, overwrite = FALSE, ...)
+{
   if (!is.list(lst) || is.data.frame(lst)) {
     obj <- deparse(match.call(expand.dots = TRUE)[-1][[1]])
     stop(glue::glue("invalid argument: '{obj}' is not a list"))
   }
-
   i <- 1
-
   for (i in seq_along(lst)) {
     if (is.null(names(lst)[i])) {
       named_as <- i
       i <<- i + 1
     }
-
     if (!is.null(names(lst)[i])) {
       named_as <- names(lst)[i]
       i <<- i + 1
     }
 
-    d8ahelper::save_csv(lst[[i]],
-                        file.name = glue::glue("{named_as}.csv"),
-                        overwrite = overwrite,
-                        ...)
+    #guard clause for empty df
+    if (!is.data.frame(lst[[i]])) {return(NA)}
+
+    d8ahelper::save_csv(lst[[i]], file.name = glue::glue("{named_as}.csv"),
+                        overwrite = overwrite, ...)
   }
 }
 
@@ -266,7 +267,7 @@ fread2 <- function(file, ...) {
 
 #' load files paths in specified location
 
-load_files <- function(loc,
+load_files <- function(load_from,
                        pattern = ".csv",
                        read_as_df = TRUE,
                        avoid = "^_|archive",
@@ -274,13 +275,14 @@ load_files <- function(loc,
                        load = FALSE,
                        ...) {
   #'
+  #' @param load_from a path for where files are load from
   #' @param load a logical for if actually read the files; if pattern is not ".csv", then read as text
   #' @param read_as_df a logical, if to read as data frame, else read as text
 
   files <-
-    list.files(loc, full.names = full.names, pattern = pattern, ...)
+    list.files(load_from, full.names = full.names, pattern = pattern, ...)
   names(files) <-
-    str_extract(list.files(loc, full.names = FALSE, , pattern = pattern),
+    str_extract(list.files(load_from, full.names = FALSE, , pattern = pattern),
                 "^[^\\.]*")
   files <- files[!grepl(avoid, names(files))]
 

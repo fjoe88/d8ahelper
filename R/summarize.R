@@ -5,11 +5,12 @@
 #'
 #' @param n number of top/bottom rows to include, or number of characters in case of a string
 #' @return top, bottom and a transition rows suggest how many rows skipped
+#' @simplify a bool, if FALSE will return named vectors with name being original string
 #' @examples
 #' headtail(mtcars)
 #' headtail("I would like to make this a very long string in order to make my case")
 
-headtail <- function(df, n = 5) {
+headtail <- function(df, n = 5, simplify = TRUE) {
   if (is.data.frame(df)) {
     if (nrow(df) <= 2 * n) {
       head(df, nrow(df))
@@ -22,7 +23,7 @@ headtail <- function(df, n = 5) {
       rbind(head(df, n), skip.row, tail(df, n))
     }
   } else if (is.character(df)) {
-    sapply(df, function(x) {
+    result <- sapply(df, function(x) {
       if (nchar(x) <= 2 * n) {
         x
       } else {
@@ -31,6 +32,12 @@ headtail <- function(df, n = 5) {
         paste(head, tail, sep = " ... ")
       }
     })
+
+    if(simplify == TRUE){
+      names(result) <- NULL
+    }
+
+    result
 
   }
 }
