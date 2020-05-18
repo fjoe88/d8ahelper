@@ -101,7 +101,7 @@ copy_unique <-
   }
 
 
-#' Fast way to output CSV files
+#' A custom way to output CSV files
 #'
 #' Will copy file path to clipboard for convinient file locate or remove (via unlink())
 #'
@@ -114,10 +114,10 @@ copy_unique <-
 save_csv <- function(df,
                      file.name = "r_output.csv",
                      path = here::here("r_output"),
-                     time_as_chr = FALSE,
                      folder = "",
                      overwrite = FALSE,
                      use_readr = FALSE,
+                     as_chr = TRUE,
                      ...) {
 
   if (!is.data.frame(df)) return(NA)
@@ -130,6 +130,12 @@ save_csv <- function(df,
                showWarnings = FALSE)
   }
 
+  datetime <- format(Sys.time(), "%Y_%m_%d_%H_%M_%S")
+
+  if (file.name == "r_output.csv") {
+    file.name <- glue::glue("r_output_{datetime}.csv")
+  }
+
   file = file.path(path,
                    folder,
                    file.name)
@@ -140,8 +146,8 @@ save_csv <- function(df,
     unlink(file)
   }
 
-  if (time_as_chr == TRUE) {
-    df <- d8ahelper::convert_time_to_chr(df)
+  if (as_chr == TRUE) {
+    df <- df %>% dplyr::mutate_all(as.character)
   }
 
   if (use_readr == FALSE){
@@ -158,36 +164,48 @@ save_csv <- function(df,
 
 }
 
-#' a wrapper function of save_csv that applies to a list of data frames
+#' A wrapper function of save_csv that applies to a list of data frames
 
-save_csv_from_a_list <- function(lst, overwrite = FALSE, ...)
+save_csv_from_a_list <- function(lst,
+                                 overwrite = FALSE,
+                                 use_name = FALSE,
+                                 use_clean_names = TRUE,
+                                 ...)
 {
+  lst[is.na(lst)] <- NULL
+  lst[!sapply(lst, function(x) is.data.frame(x)
+  )] <- NULL
+
+  if (use_clean_names == TRUE) {
+    names(lst) <- janitor::make_clean_names(names(lst), case = "snake")
+  }
+
+
   if (!is.list(lst) || is.data.frame(lst)) {
     obj <- deparse(match.call(expand.dots = TRUE)[-1][[1]])
     stop(glue::glue("invalid argument: '{obj}' is not a list"))
   }
+
   i <- 1
+
   for (i in seq_along(lst)) {
-    if (is.null(names(lst)[i])) {
+    if (is.null(names(lst)[i]) || use_name == FALSE) {
       named_as <- i
       i <<- i + 1
-    }
-    if (!is.null(names(lst)[i])) {
+    } else {
       named_as <- names(lst)[i]
       i <<- i + 1
     }
 
-    #guard clause for empty df
-    if (!is.data.frame(lst[[i]])) {return(NA)}
-
-    d8ahelper::save_csv(lst[[i]], file.name = glue::glue("{named_as}.csv"),
-                        overwrite = overwrite, ...)
+    d8ahelper::save_csv(lst[[i]],
+                        file.name = glue::glue("{named_as}.csv"),
+                        overwrite = overwrite,
+                        ...)
   }
 }
 
 
-
-#' Fast way to load CSV files
+#' A custom way to load CSV files
 #'
 #' @param file.name character name for output file name
 #' @param path target folder, by default use 'r_output' folder under root directory
@@ -217,7 +235,7 @@ load_csv <- function(file = 'r_output.csv',
                        file)
     }
 
-    data.table::fread(file = file, ...)
+    data.table::fread(file = file, na.strings = c("", "NA"), ...)
   }
 }
 
@@ -266,31 +284,35 @@ fread2 <- function(file, ...) {
 }
 
 #' load files paths in specified location
-
+#' @param load_from a path for where files are load from
+#' @param load a logical for if actually read the files; if pattern is not ".csv", then read as text
+#' @param read_as_df a logical, if to read as data frame, else read as text
+#'
+#'
 load_files <- function(load_from,
-                       pattern = ".csv",
+                       pattern = "\\.csv$",
                        read_as_df = TRUE,
                        avoid = "^_|archive",
                        full.names = TRUE,
                        load = FALSE,
                        ...) {
-  #'
-  #' @param load_from a path for where files are load from
-  #' @param load a logical for if actually read the files; if pattern is not ".csv", then read as text
-  #' @param read_as_df a logical, if to read as data frame, else read as text
 
   files <-
     list.files(load_from, full.names = full.names, pattern = pattern, ...)
   names(files) <-
-    str_extract(list.files(load_from, full.names = FALSE, , pattern = pattern),
+    stringr::str_extract(list.files(load_from, full.names = FALSE, pattern = pattern),
                 "^[^\\.]*")
   files <- files[!grepl(avoid, names(files))]
 
   if (load == TRUE) {
     if (read_as_df == TRUE) {
       file.list <-
-        lapply(as.list(files), function(x)
-          readr::read_csv(x, col_types = cols()))
+        lapply(as.list(files), function(x){
+          # readr::read_csv(x, col_types = cols())
+          df <- data.table::fread(x, na.strings = c("", "NA"))
+          df <- tibble::as_tibble(df)
+        })
+
       return(file.list)
     }
 
@@ -306,92 +328,116 @@ load_files <- function(load_from,
 }
 
 
+
 # Encryption ----------------------------------------------------------------------------------
 
-#' A wrapper function for generating, store, and read key
-#' @example
-#' key <- gen_key(folder = "folder_where_key_is_stored")
+#' A wrapper function for sodium::keygen to generate, convert keys
 
-gen_key <- function(file = ".key",
-                    key.wrap = TRUE) {
+gen_key <- function(key_file,
+                    convert_to_sodium_key = FALSE) {
 
+  key <- sodium::keygen()
+  saveRDS(key, file = key_file, compress = FALSE)
 
-  if (!file.exists(here::here(file))){
-    key <- sodium::keygen()
-    saveRDS(key, file = here::here(file), compress = FALSE)
-    return(key)
-  } else {
-    key <- readRDS(file = here::here(file))
-  }
-
-  if (key.wrap == TRUE) {
+  if (convert_to_sodium_key == TRUE) {
     key <- cyphr::key_sodium(key)
-  } else {key}
+  }
+
+  return(key)
 }
 
-#' A wrapper function for encrypting/delete file using key
-#' @example
-#' d8ahelper::save_csv(iris, file.name = "iris.csv")
-#' d8ahelper::encrypt("iris.csv", "iris_locked.csv")
-#' d8ahelper::decrypt("iris_locked.csv", "iris_unlocked.csv")
+#' A wrapper function to encrypt file using a key
 
-encrypt <- function(file,
-                    dest,
-                    key = gen_key(),
-                    keep.original = FALSE) {
+encrypt <- function(file_orig,
+                    file_enc,
+                    key_file) {
 
-  file.path = here::here(file)
-  dest.path = here::here(dest)
+  if (file.exists(key_file)){
+    key <- readRDS(file = key_file)
+    key <- cyphr::key_sodium(key)
+  }
 
-  cyphr::encrypt_file(path = file.path,
+  if (!file.exists(key_file)){
+    key <- gen_key(key_file,
+                   convert_to_sodium_key = TRUE)
+  }
+
+  cyphr::encrypt_file(path = file_orig,
                       key = key,
-                      dest = dest.path)
+                      dest = file_enc)
 
-  if (keep.original == FALSE && file.exists(file.path)) {
-    unlink(file.path)
+  if (file.exists(file_orig)) {
+    unlink(file_orig)
+  } else {
+    stop("Exit: file to encrypt does not exist.")
   }
 }
 
-#' A wrapper function for decrypting/delete file using key
-#' @example
-#' d8ahelper::save_csv(iris, file.name = "iris.csv")
-#' d8ahelper::encrypt("iris.csv", "iris_locked.csv")
-#' d8ahelper::decrypt("iris_locked.csv", "iris_unlocked.csv")
+#' A wrapper function to decrypt file using a key
+#'
+decrypt <- function(file_enc,
+                    file_orig,
+                    key_file) {
 
-decrypt <- function(file,
-                    dest,
-                    key = gen_key(),
-                    keep.original = FALSE) {
+  if (file.exists(key_file)){
+    key <- readRDS(file = key_file)
+  }
 
-  file.path = here::here(file)
-  dest.path = here::here(dest)
+  if (!file.exists(key_file)){
+    stop(glue::glue("did not find key in {key_file}"))
+  }
 
-  cyphr::decrypt_file(path = file.path,
+  key <- cyphr::key_sodium(key)
+
+  cyphr::decrypt_file(path = file_enc,
                       key = key,
-                      dest = dest.path)
+                      dest = file_orig)
 
-  if (keep.original == FALSE && file.exists(file.path)) {
-    unlink(file.path)
+  if (file.exists(file_enc)) {
+    unlink(file_enc)
+  } else {
+    stop("Exit: file to decrypt does not exist.")
   }
 }
 
-#' A wrapper function for the workflow of decryption, source and encryption of a '.R' file
+
+
+#' A wrapper function for the workflow of decrypt, source and encrypt back files
+#' @param encrypt a bool, if TRUE then encrypt the file with key_file
+
 
 open_encrypted <- function(file_actual,
                            file_encrypted,
-                           encrypt = FALSE) {
+                           encrypt = FALSE,
+                           key_file,
+                           file_type = "r") {
 
   if (file.exists(file_actual) && encrypt == FALSE) {
-    stop("decrypted file already exists")
+    stop("decrypted file already exists, try use encrypt = TRUE if to encrypt the file first")
   } else if (file.exists(file_actual) && encrypt == TRUE) {
-    d8ahelper::encrypt(file_actual, file_encrypted)
+    encrypt(file_orig = file_actual,
+            file_enc = file_encrypted,
+            key_file = key_file)
   }
 
-  d8ahelper::decrypt(file = file_encrypted,
-                     dest = file_actual)
+  decrypt(file_orig = file_actual,
+          file_enc = file_encrypted,
+          key_file = key_file)
 
-  source(here::here(file_actual))
+  if (file_type == "r") {
+    source(file_actual)
+  }
 
-  d8ahelper::encrypt(file = file_actual,
-                     dest = file_encrypted)
+  if (file_type == "csv") {
+    df <- readr::read_csv(file = file_actual)
+  }
+
+  encrypt(file_enc = file_encrypted,
+          file_orig = file_actual,
+          key_file = key_file)
+
+  if (file_type == "csv") {
+    return(df)
+  }
+
 }
