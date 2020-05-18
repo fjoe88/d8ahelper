@@ -15,7 +15,7 @@ format_to_percentage <- function(x,
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
-#' Trim numbers to 2 digit after decimal point format
+#' Format numbers to limit digits after decimal point
 #'
 #' Accept numerical vectors, or data.frame
 
@@ -42,12 +42,18 @@ format_num <-
 #' @example
 #' format_datetime(df, "datetime", timeformat = "%m/%d/%Y %H:%M:%S %p")
 
-format_datetime <- function(df, regex, timeformat, ...) {
+format_datetime <- function (df,
+                             regex,
+                             timeformat = "%Y/%m/%d %H:%M:%S %p",
+                             ...)
+{
   if (is.data.frame(df)) {
     for (col in names(df)[grep(regex, names(df))]) {
-      df[[col]] <- readr::parse_datetime(raw1[[col]], format = timeformat)
+      df[[col]] <- readr::parse_datetime(df[[col]],
+                                         format = timeformat)
     }
-  } else{
+  }
+  else {
     df <- readr::parse_datetime(df, format = timeformat)
   }
   return(df)
