@@ -4,11 +4,11 @@ Title: Convinience functions for helping with data manipulations
 Version: 0.1.0
 Author: zhoufang
 Maintainer: Joe Fang <zhoufang@micron.com>
-Description: Convinience functions for helping with data manipulations    Package splits into modules of transfer, transform, summarize, formatting, visualize, modelling, and wafer (specific to semiconductor manufacturing)
+Description: Convinience functions for helping with data manipulations
+Depends: R (>= 3.2)
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: 
-    R (>= 3.2)
 Imports:
     lubridate,
     data.table,
@@ -17,3 +17,4 @@ Imports:
     glue,
     here
 RoxygenNote: 6.1.1
+

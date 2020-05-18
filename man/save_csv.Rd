@@ -5,7 +5,8 @@
 \title{Fast way to output CSV files}
 \usage{
 save_csv(df, file.name = "r_output.csv", path = here::here("r_output"),
-  time_as_chr = FALSE, folder = "", overwrite = FALSE, ...)
+  time_as_chr = FALSE, folder = "", overwrite = FALSE,
+  use_readr = FALSE, ...)
 }
 \arguments{
 \item{df}{a data frame}

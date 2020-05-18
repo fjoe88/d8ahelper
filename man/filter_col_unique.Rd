@@ -4,21 +4,22 @@
 \alias{filter_col_unique}
 \title{wraper function to caret::nearZeroVar to filter chr columns for Zero- and Near Zero-Variance Predictors}
 \usage{
-filter_col_unique(df, percentUnique = 50, freqRatio = 1, breaks = 50,
-  useDefault = FALSE, plot = TRUE, simplify = FALSE)
+filter_col_unique(df, percentUnique = 50, levelsAtMost = 30,
+  freqRatio = 1, breaks = 50, useDefault = FALSE, quiet = FALSE,
+  simplify = FALSE)
 }
 \arguments{
 \item{df}{a data frame}
 
-\item{percentUnique}{a numeric for percentUnique threshold}
+\item{percentUnique}{a numeric for percentUnique threshold, distinct values to total number of  samples, default to cut off if above 50percent.}
 
-\item{freqRatio}{a numeric for freqRatio threshold}
+\item{freqRatio}{a numeric for freqRatio threshold (most common value to the second most common value, default to cut off if below 1)}
 
 \item{useDefault}{a logical for if to use caret default for removing near zero variance variables}
 
-\item{plot}{a logical for if to include histograms of percentUnique and freqRatio}
-
 \item{simplify}{a logical for if to simplify output to a single data frame, else return a list}
+
+\item{plot}{a logical for if to include histograms of percentUnique and freqRatio}
 }
 \description{
 wraper function to caret::nearZeroVar to filter chr columns for Zero- and Near Zero-Variance Predictors

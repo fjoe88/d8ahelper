@@ -2,7 +2,7 @@
 % Please edit documentation in R/formatting.R
 \name{format_to_percentage}
 \alias{format_to_percentage}
-\title{Convert integer/floating point number format to 'dd.dd%' percentage format}
+\title{Convert integer/floating point number format to percentage format}
 \usage{
 format_to_percentage(x, digits = 2, format = "f", ...)
 }
@@ -14,5 +14,5 @@ format_to_percentage(x, digits = 2, format = "f", ...)
 \item{format}{default to "f" which gives numbers in the usual xxx.xxx format. see help(formatC)}
 }
 \description{
-Convert integer/floating point number format to 'dd.dd%' percentage format
+Convert integer/floating point number format to percentage format
 }

@@ -4,7 +4,8 @@
 \alias{corr_to_df}
 \title{filter high corr features and output in tidy format
 input: corr matrix of numerical format
-output: a data frame}
+output: a data frame
+if level == 1, find perfectly correlated features aside from themselves}
 \usage{
 corr_to_df(cor, level = 0.9)
 }
@@ -12,4 +13,5 @@ corr_to_df(cor, level = 0.9)
 filter high corr features and output in tidy format
 input: corr matrix of numerical format
 output: a data frame
+if level == 1, find perfectly correlated features aside from themselves
 }

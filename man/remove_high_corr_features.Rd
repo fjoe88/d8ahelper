@@ -2,14 +2,20 @@
 % Please edit documentation in R/modelling.R
 \name{remove_high_corr_features}
 \alias{remove_high_corr_features}
-\title{wraper function ofcaret::findCorrelation: find and remove highly correlated features
+\title{wraper function ofcaret::findCorrelation: find and remove highly correlated features}
+\usage{
+remove_high_corr_features(df, level = 0.99, simplify = FALSE)
+}
+\arguments{
+\item{df}{a data frame of numerical values w/o NAs}
+
+\item{level}{a numeric for threshold as cutoff point for defining 'high correlation'
 returns a list of 1) reduced df 2) corr table of removed features
 requires data frame of numeric w/o missing values}
-\usage{
-remove_high_corr_features(df, level = 0.99)
 }
 \description{
 wraper function ofcaret::findCorrelation: find and remove highly correlated features
-returns a list of 1) reduced df 2) corr table of removed features
-requires data frame of numeric w/o missing values
+}
+\details{
+if level == 1, find all perfectly correlated variables, remove half and return a list containing removed feature name pairs, unless simplify == TRUE
 }
