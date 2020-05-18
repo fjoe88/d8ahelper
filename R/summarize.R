@@ -42,7 +42,7 @@ headtail <- function(df, n = 5, simplify = TRUE) {
   }
 }
 
-#' get mode of a vector
+#' Get the mode of a vector
 #'
 #' @example
 #' x <- c("a","d","a","b","a","c",NA,NA,NA,NA,NA)
@@ -60,7 +60,7 @@ get_mode <- function(x, na.rm = TRUE) {
 }
 
 
-#' function factory for nth quantile
+#' Function factory to create nth quantile function
 
 ff_quantile <- function(num){
   function(x, ...) {
@@ -152,12 +152,13 @@ sum_table <- function(df, x, y, sum = TRUE, ...) {
 sum_col <- function(df,
                     outlier_method = "z",
                     thres = 3,
+                    view = TRUE,
                     ...) {
 
   if (!is.data.frame(df))
-    stop("Only data.frame object is accepted")
+    stop("not a data.frame")
 
-  print(class(df))
+  message(class(df))
 
   summary <- dplyr::tibble(
     "col.name" = colnames(df),
@@ -232,11 +233,19 @@ sum_col <- function(df,
       }
     })
   )
+
+  if (view == TRUE){
+    View(summary)
+  } else {
+    return(summary)
+  }
 }
 
+#'Generate row-wise summary for missing and unique values
+#'
+
 sum_row <- function(df) {
-  #'generate row-wise summary for missing and unique values
-  #'
+
   data.frame(
     "NAs" = apply(df, 1, function(x)
       sum(is.na(x))),
@@ -251,10 +260,11 @@ sum_row <- function(df) {
   )
 }
 
+#'Sister function to sum_col and sum_row, returns a list of results from each
+#'
+
 sum_df <- function(df){
-  #'sister function to sum_col and sum_row
-  #'returns a list
-  #'
+
   list("col_summary" <- d8ahelper::sum_col(df),
        "row_summary" <- d8ahelper::sum_row(df))
 }
