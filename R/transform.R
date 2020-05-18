@@ -2,11 +2,7 @@
 
 # transform -----------------------------------------------------------------------------------
 
-#' simply remove NAs given a vector
-#'
-rm_na <- function(x) x[!is.na(x)]
-
-#' Trim leading and trailing white spaces
+#' Remove leading and trailing white spaces
 #'
 #' By default, trim both leading and traling white spaces unless specified
 #' @param x a character
@@ -40,7 +36,7 @@ trim_spaces <- function(x,
 
 }
 
-#' Move column to far left hand side
+#' Move column or columns to far left hand side of a dataframe
 #'
 #' Accept multiple columns if passed in a character vector containing column names
 #' @param df a data frame
@@ -50,7 +46,8 @@ trim_spaces <- function(x,
 #' View(move_left(mtcars, c("gear", "carb", "wt")))
 
 move_left <- function(df, str) {
-  if ((all(str %in% names(df)) == TRUE) & (ncol(df) > 1)){
+  str <- intersect(names(df), str)
+  if (length(str) >= 1){
     col.indx.part1 <- sapply(seq_along(str), function(i) {
       which(str[i] == names(df))
     })
@@ -58,27 +55,15 @@ move_left <- function(df, str) {
     col.indx.part2 <- seq_len(ncol(df))[!seq_len(ncol(df)) %in% col.indx.part1]
     df <- df[, c(col.indx.part1, col.indx.part2)]
   } else {
-    message("column(s) names mismatch, return original data frame")
+    message("No matching columns found, return original data frame")
     return(df)
   }
 }
 
-
-add_datehour <- function(df, datecol = "trackedout", ...) {
-  #generage Date and Hour column based on Datetime column
-
-  df$Date <- lubridate::as_date(df[[datecol]])
-  df$Hour <- lubridate::hour(df[[datecol]])
-  df <- df %>%
-    mutate("DateHour" = paste0(Date, "-", Hour))
-
-  df$Date <- as.factor(df$Date)
-  df$DateHour <- as.factor(df$DateHour)
-  return(df)
-}
+#Add week, weekday, month, year columns based on datetime column
 
 add_wmy <- function(df, dt_col) {
-  #add week, weekday, month, year columns
+
 
   if (is.POSIXct(df[[dt_col]])) {
     df$dWeek <- as.factor(weekdays(df[[dt_col]]))
@@ -94,40 +79,22 @@ add_wmy <- function(df, dt_col) {
   }
 }
 
-# Removing
+# Filter column by removing points beyond top and(or) bottom percentage thresholds
 
 subset_by_quantile <- function(df,
                                col,
                                top = 0,
                                bottom = 0,
                                ...) {
-  #remove top% and(or) bottom%
+
   df %>%
     filter(df[[col]] >= quantile(df[[col]], bottom, na.rm = TRUE),
            df[[col]] <= quantile(df[[col]], 1 - top, na.rm = TRUE))
 }
 
-
-
-#' Convert time related columns to character
-#'
-#' background: POSIXct datetime format when output as csv will not be read corretly with JMP \cr
-#' purpose: convert all time columns to character format befor exporting to csv \cr
-#' note: accept regex if default rule of selecting columns containing "time" is not ideal \cr
-#'
-#' @param df a data frame
-#' @param regex a regular expression character vector, to be used for matching to time column names
-#' @example df <- convert_time_to_chr(df, re = "time|datetime|trackedout")
-
-convert_time_to_chr <- function(df, re = "datetime") {
-  df %>% dplyr::mutate_at(vars(matches(!!re)), as.character)
-}
-
-
 # join -----------------------------------------------------------------------------------
 
-#' Join x, y data frames
-#' for columns of same names, append y values to x if rows that are missing value
+#' Coalescely join x, y data frames, for columns of same names, append y values to x if rows that are missing value
 
 coalesce_join <- function(x,
                           y,
@@ -163,7 +130,7 @@ coalesce_join <- function(x,
   dplyr::bind_cols(joined, coalesced)[cols]
 }
 
-#' sister function to coalesce_join, join together a list of data frames
+#' Wrapper function to coalesce_join, join together a list of data frames
 
 multi_join <- function(list,
                        by = NULL,
@@ -184,11 +151,19 @@ multi_join <- function(list,
 
 rm_single_unique_col <- function(df,
                                  threshold = 1) {
-  df1 <-
-    df[grepl(pattern = "^startlot$|^startlotkey$|^fulllot$|^lotid$|^lot_id$|^waferid$|^alias$", tolower(names(df)))]
-  df2 <-
-    df[!grepl(pattern = "^startlot$|^startlotkey$|^fulllot$|^lotid$|^lot_id$|^waferid$|^alias$", tolower(names(df)))]
 
+  if (length(df) <= 1 | !is.data.frame(df)) {return(df)}
+
+  ids <- wafer::detect_all(df, return_loc = TRUE)
+  df1 <- df[, ids]
+
+  rest <- setdiff(seq_along(df), ids)
+  df2 <- df[, rest]
+
+  #remove all NA columns
+  df2 <- df2[!sapply(df2, function(x) all(is.na(x)))]
+
+  #filter columns by threshold
   uniq <- sapply(df2, function(x) {
     length(unique(x[!is.na(x)]))
   })
@@ -205,7 +180,14 @@ remove_empty_rows <- function(df) {
 }
 
 # missing, NAs --------------------------------------------------------------------------------
+
 #' Remove duplicated rows of the original data frame, or a subset of if column names being passed in
+
+#' Remove NAs given a vector
+#'
+rm_na <- function(x) {
+  x[!is.na(x)]
+}
 
 remove_duplicates <- function(df, ...) {
   if (missing(...)) {
@@ -261,31 +243,31 @@ remove_duplicates <- function(df, ...) {
   }
 }
 
-#' Fill NAs with fillers
-
+#'Fill NAs and empty cells with fillers such as a character
+#'
 fill_na_as_missing <- function(df,
-                               fill = "[missing]",
-                               convert_fct_to_chr = TRUE) {
+                               fill = "[missing]") {
   if (!is.data.frame(df)) {
-    stop("only accept a data frame")
+    message('not a dataframe, return original')
+    return(df)
   }
 
-  if (convert_fct_to_chr == TRUE) {
-    df[] <- lapply(df, function(col) {
-      if (is.factor(col)) {
-        col <- as.character(col)
-      } else{
-        col
-      }
+  as.data.frame(sapply(df, function(col) {
+    if (is.character(col) | is.factor(col)) {
+      col[sapply(col, function(x) {
+        any(is.na(x), any(grep("^[[:space:]]*$", x)), x == 'NA')
+      })] <- fill
+    }
 
-    })
-  }
+    return(col)
 
-  dplyr::mutate_if(df, is.character, list( ~ tidyr::replace_na(., fill)))
+  }))
 }
 
+#' Sister function to fill_na_as_missing, replace cells with NAs if match to certain string
+
 fill_missing_as_na <- function(df, pattern = "[missing]") {
-  #' sister function to fill_na_as_missing
+
 
   df[df == pattern] <- NA
   df
@@ -293,11 +275,10 @@ fill_missing_as_na <- function(df, pattern = "[missing]") {
 
 # column names --------------------------------------------------------------------------------
 
+#' Replace column names with alpha-numeric sequences, returns a named vector (of name-value pairs) for column name look-up; Returns a list.
 
 encode_col <- function(df) {
-  #' replace column names with alpha-numeric sequences
-  #' returns a named vector (of name-value pairs) for column name look-up
-  #' returns a list
+
 
   dict <- names(df)
   names(dict) <- paste0("c", seq_along(df))
@@ -309,12 +290,14 @@ encode_col <- function(df) {
 
 }
 
+#' Sister function to encode_col
+#' returns a data frame with original column names based on df$dict
+#'
+#' @param df.list: list object generated from d8ahelper::convert_col_name
+#' @param df: data frame to convert names from, default to df within df.list
+
 decode_col <- function(df.list, df = df.list$df) {
-  #' sister function to convert_col_name
-  #' returns a data frame with original column names based on df$dict
-  #'
-  #' @param df.list: list object generated from d8ahelper::convert_col_name
-  #' @param df: data frame to convert names from, default to df within df.list
+
 
   names(df) <- sapply(names(df), function(x)
     df.list$tag[[x]])
@@ -322,14 +305,14 @@ decode_col <- function(df.list, df = df.list$df) {
 }
 
 get_name <- function(df, ...) {
-  #' sister function to convert/revert col name for retrieving column names based on id(s)
+  #' sister function to encode_col, retrieve column names based on id(s)
 
   sapply(..., function(x)
     df$tag[[x]])
 }
 
 get_id <- function(df, ...) {
-  #' sister function to convert/revert col name for retrieving column id based on name(s)
+  #' sister function to encode_col, retrieve column id based on name(s)
 
   sapply(..., function(x)
     names(df$tag)[df$tag == x])
@@ -369,10 +352,10 @@ str_find <- function(str,
   }
 }
 
-# tricks --------------------------------------------------------------------------------------
+# Others --------------------------------------------------------------------------------------
 
 
-#' Append empty rows to a dataframe to make row number = n
+#' Append empty rows to a dataframe to make row number a target number
 #'
 #' @param n a numeric, the number of rows of the outcome table after filling missing rows
 
@@ -387,7 +370,7 @@ add_empty_rows <- function(df, n) {
 }
 
 
-#' Insert NAs randomly to a data.frame
+#' Insert(inject) NAs as replacement randomly to a data
 #'
 #' @param df a data frame
 #' @param percent percent of NAs per column
