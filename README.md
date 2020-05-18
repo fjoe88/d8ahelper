@@ -1,92 +1,136 @@
 # d8ahelpeR
 
+*2019-12-26*
+
+zhoufang
+
 ###### A set of convenience functions around data manipulation (import/formatting/transform/summarize/visualize).
 
-![d8ahelpeR](./IMAGES/logo.jpg)
+## Modules
 
+### [Programming](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/programming.R)
 
-### [Programming](https://github.com/fjoe88/d8ahelper/blob/master/R/programming.R)
+`lapply_preserve_names` base R `lapply` wrapper since it give access to only the element of the vector but not other attributes
 
-- `lapply_preserve_names`
+`list_files_fwd_slash` wraper function list.files to allow coppied windows path format containing backward slashes
 
-### [Formatting](https://github.com/fjoe88/d8ahelper/blob/master/R/formatting.R)
+`is_fct_or_chr`
 
-- `format_to_percentage`
-- `format_num`
-- `format_datetime`
+### [Formatting](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/formatting.R)
 
-### [Summarize](https://github.com/fjoe88/d8ahelper/blob/master/R/summarize.R)
+`format_to_percentage` convert integer/floating point number format to percentage format
 
-- `headtail`
-- `unique_row`
-- `sum_table`
-- `sum_col`
-- `sum_missing`
+`format_num` format numbers to limit digits after decimal point
 
-### [Transform](https://github.com/fjoe88/d8ahelper/blob/master/R/transform.R)
+`format_datetime` format datetime columns to a specified format
 
-- `trim_spaces`
-- `insert_nas`
-- `move_left`
-- `add_datehour`
-- `add_wmy`
-- `subset_by_quantile`
-- `add_empty_rows`
-- `convert_time_to_chr`
+### [Summarize](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/summarize.R)
 
-#### join
+`headtail` a quick glance into a dataframe combining n head and tail rows
 
-- `coalesce_join`
-- `multi_join`
+`get_mode` get the mode of a vector
 
-#### redundant rows/columns
+`ff_quantile` function factory to create nth quantile function, such as ```q5 <- ff_quantile(0.05)```
 
-- `rm_single_unique_col`
-- `remove_empty_rows`
+`unique_row` extract unique rows combinations and show row counts
+
+`sum_table` given 2 columns, summarize counts of each unique value-pair combinations
+  
+`sum_col` summarize a data frame with concise and useful summary statistics
+
+`sum_row` generate row-wise summary for missing and unique values
+
+`sum_df` sister function to sum_col and sum_row, returns a list of results from each
+
+`sum_missing` summary statistics of top n missing value columns
+
+### [Transform](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/transform.R)
+
+`trim_spaces` remove leading and trailing white spaces
+
+`move_left` move column or columns to far left hand side of a dataframe
+
+`add_wmy` add week, weekday, month, year columns based on datetime column
+
+`subset_by_quantile` filter column by removing points beyond top and(or) bottom percentage thresholds
+
+`add_empty_rows` append empty rows to a dataframe to make row number to a target number
+
+`insert_nas` insert(inject) NAs as replacement randomly to a data.frame
+
+#### Join
+
+`coalesce_join` coalescely join x, y data frames, for columns of same names, append y values to x if rows that are missing value
+
+`multi_join` wrapper function to coalesce_join, join together a list of data frames
+
+#### Redundant rows/columns
+
+`rm_single_unique_col` remove column(s) if containing a single unique value
+
+`remove_empty_rows` remove duplicated rows of the original data frame, or a subset of if column names being passed in
 
 #### NAs / missing values
 
-- `remove_duplicates`
-- `fill_na_as_missing`
-- `fill_missing_as_na`
+`rm_na` remove NAs given a vector
 
-#### column names encode/decode
-- `encode_col`
-- `decode_col`
-- `get_name`
-- `get_id`
+`fill_na_as_missing` fill NAs and empty cells with fillers such as a character
 
-### [Transfer](https://github.com/fjoe88/d8ahelper/blob/master/R/transfer.R)
+`fill_missing_as_na` sister function to fill_na_as_missing, replace cells with NAs if match to certain string
 
-- `copy_unique`
-- `copy_as_sql`
-- `copy_as_sql_like`
-- `save_csv`
-- `load_csv`
-- `from_excel`
-- `write_fwf`
-- `fread2`
-- `load_files`
-- `gen_key`
-- `encrypt`
-- `decrypt`
-- `open_encrypt`
+#### Column names encode/decode
 
-### [Visualize](https://github.com/fjoe88/d8ahelper/blob/master/R/visualize.R)
+`encode_col` replace column names with alpha-numeric sequences, returns a named vector (of name-value pairs) for column name look-up; Returns a list.
 
-- `multiplot`
-- `plot_boxplot`
-  - boxplot with confidence intervals and summary statistics such as p-val and risk
+`decode_col` sister function to encode_col to revert encoded list of dataframes
 
-### [Modelling](https://github.com/fjoe88/d8ahelper/blob/master/R/modelling.R)
+`get_name` sister function to encode_col, retrieve column names based on id(s)
 
-- `filter_col_unique`
-  - wraper function to caret::nearZeroVar to filter chr columns for Zero- and Near Zero-Variance Predictors
-- `create_dummy`
-  - wraper function to use caret::dummyVars to create dummy variables from character variables
-- `corr_to_df`
-  - filter high corr features and output in tidy format
-- `remove_high_corr_features`
-  - wraper function ofcaret::findCorrelation: find and remove highly correlated features
-- `model_lm`
-  - run lm model and print a curated summary output
+`get_id` sister function to encode_col, retrieve column id based on name(s)
+
+#### Regular Expressions
+
+`str_find` wrapper function for locate a string based on regex leading to and after it
+
+### [Transfer](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/transfer.R)
+
+`copy_unique` copy unique values to clipboard
+
+`save_csv` a custom way to output CSV files
+
+`save_csv_from_a_list` a wrapper function of save_csv that applies to a list of data frames
+
+`load_csv` a custom way to load CSV files
+
+`from_excel` wrapper function for convinient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
+
+`write_fwf` 
+
+`fread2` wrapper function to data.table::fread to convert blank cells to NA at reading
+
+`load_files` load files paths in specified location
+
+#### Encrypt/decrypt
+
+`gen_key` a wrapper function for `sodium::keygen` to generate, convert keys
+
+`encrypt` a wrapper function to encrypt file using a key
+
+`decrypt` a wrapper function to decrypt file using a key
+
+`open_encrypt` a wrapper function for the workflow of decrypt, source and encrypt back files
+
+### [Visualize](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/visualize.R)
+
+`multiplot`
+
+`plot_boxplot` boxplot with confidence intervals and summary statistics such as p-val and risk
+
+### [Modelling](https://bitbucket.micron.com/bbdc/users/zhoufang/repos/d8ahelper/browse/R/modelling.R)
+
+`corr_to_df` filter high corr features and output in tidy format
+
+`remove_high_corr_features` wraper function to caret::findCorrelation: find and remove highly correlated features
+
+`model_lm` run lm model and print a curated summary output
+
