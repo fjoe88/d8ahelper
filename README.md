@@ -2,9 +2,13 @@
 
 *2019-12-26*
 
-zhoufang
+*zhoufang*
 
-###### A set of convenience functions around data manipulation (import/formatting/transform/summarize/visualize).
+![d8ahelper](./IMAGES/d8ahelper.png)
+
+
+*A set of convenience functions around data manipulation.*
+
 
 ## Modules
 
