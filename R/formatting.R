@@ -58,3 +58,23 @@ format_datetime <- function (df,
   }
   return(df)
 }
+
+#' Capitalize the first letter of each word in the string
+#'
+#' @example
+#' cap_str("a WOrd CAPITALIZED,   with extra   spaces,with no leading space")
+
+cap_str <- function(x, collapse = " ") {
+
+  x <- tolower(x)
+  x <- strsplit(x, ",", perl = TRUE)[[1]]
+  x <- paste(x, collapse = ", ")
+  x <- strsplit(x, "[[:space:]]+", perl = TRUE)[[1]]
+
+  paste(toupper(substring(x, 1,1)),
+        substring(x, 2),
+        sep="",
+        collapse=collapse)
+}
+
+
