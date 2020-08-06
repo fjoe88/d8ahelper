@@ -3,9 +3,9 @@
 .RData
 .Ruserdata
 
-# moved to 'wafer' package
 R/Archive/
 r_output
 R_output
 
 .key
+*.Rout

@@ -46,7 +46,7 @@ trim_spaces <- function(x,
 #' View(move_left(mtcars, c("gear", "carb", "wt")))
 
 move_left <- function(df, str) {
-  str <- intersect(names(df), str)
+  str <- intersect(str, names(df)) #to preserve order by str
   if (length(str) >= 1){
     col.indx.part1 <- sapply(seq_along(str), function(i) {
       which(str[i] == names(df))
@@ -149,25 +149,29 @@ multi_join <- function(list,
 
 #' Remove column(s) if containing a single unique value
 
-rm_single_unique_col <- function(df,
-                                 threshold = 1) {
-
-  if (length(df) <= 1 | !is.data.frame(df)) {return(df)}
+rm_single_unique_col <- function (df,
+                                  threshold = 1,
+                                  exclude = c())
+{
+  if (length(df) <= 1 | !is.data.frame(df)) {
+    return(df)
+  }
 
   ids <- wafer::detect_all(df, return_loc = TRUE)
-  df1 <- df[, ids]
 
+  if (length(exclude) > 0) {
+    ids_excl <- which(names(df) %in% exclude)
+    ids <- union(ids, ids_excl)
+  }
+
+  df1 <- df[, ids]
   rest <- setdiff(seq_along(df), ids)
   df2 <- df[, rest]
-
-  #remove all NA columns
-  df2 <- df2[!sapply(df2, function(x) all(is.na(x)))]
-
-  #filter columns by threshold
+  df2 <- df2[!sapply(df2, function(x)
+    all(is.na(x)))]
   uniq <- sapply(df2, function(x) {
     length(unique(x[!is.na(x)]))
   })
-
   cbind(df1, df2[, !uniq %in% c(0:threshold)])
 }
 
