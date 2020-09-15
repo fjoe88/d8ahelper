@@ -297,4 +297,31 @@ sum_missing <- function(df, num = 5, ...) {
   df_missing <- move_left(df_missing, "colname")
 }
 
+#'Examine if containing value
+#'@param x a vector or a list
+#'@example
+#'foo <- c(NA, NULL, "", "  ", "first value")
+#'contain_value(foo)
+#'which(contain_value(foo))
+#'
+contain_value <- function(x){
+
+  doesnt_contain_value <- function(x){
+    c1 <- is.null(x)
+    c2 <- is.na(x)
+    c3 <- grepl("^[[:space:]]?$", x)
+
+    return(any(c(c1, c2, c3)))
+  }
+
+  #length(NULL) == 0
+  if (length(x)<=1) {
+    return(!doesnt_contain_value(x))
+  }
+
+  sapply(x, function(y){
+    !doesnt_contain_value(y)
+    })
+}
+
 
