@@ -183,6 +183,50 @@ remove_empty_rows <- function(df) {
   df %>% filter(Reduce(`+`, lapply(., is.na)) != ncol(.))
 }
 
+#' Remove duplicated rows by leaving only 1 observation per each group of most non-missing data columns
+#' if multiple observations sharing equal number of most non-missing data columns, choose the first one by row index
+#' a wrapper function of d8ahelper::any_dups
+#' @param keys a character vector contains column names, for grouping purposes
+rm_dups_w_less_data <- function(df, keys){
+  dups <- any_dups(df, keys = keys)
+
+  dt <- data.table::as.data.table(df)
+
+  dt.uniq <- dt[!dups$dup_row_bool, ]
+
+  dt.dup <- dups$dups
+
+  sums <- apply(dt.dup[, -keys, with=FALSE], 1, function(row){
+    sum(d8ahelper::contain_value(row))
+  })
+
+  .first_max <- function(...){
+    if (!is.numeric(c(...))){
+      stop('only accept numerics')
+    }
+
+    bool <- c(...) == max(...)
+
+    if (sum(bool) > 1){
+      bool[which(bool)[-1]] <- FALSE
+    }
+
+    return(bool)
+  }
+
+  dt.dup$.sums <- sums
+
+  dt.dup <- dt.dup[dt.dup[, .I[.first_max(.sums)], by=keys]$V1]
+
+  dt.dup[, .sums:=NULL]
+
+  message(glue::glue("{nrow(dups$dups)-nrow(dt.dup)} rows removed."))
+
+  rbind(dt.uniq, dt.dup)
+
+}
+
+
 # missing, NAs --------------------------------------------------------------------------------
 
 #' Remove duplicated rows of the original data frame, or a subset of if column names being passed in
@@ -275,6 +319,164 @@ fill_missing_as_na <- function(df, pattern = "[missing]") {
 
   df[df == pattern] <- NA
   df
+}
+
+
+#' Artificially increase the number of rows to make up any missing combinations by label columns for every unique id
+#' 'Puff up' the dataframe by filling in the missing entries with artificial data, default NA
+#' Will move id columns and label columns to the far left
+#' tidyr::crossing and tidyr::expand.grid perform similar function but do require loading up tidyr package first
+#'
+
+
+puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
+  df <- as.data.frame(df)
+
+  any_missing <- Reduce("|", lapply(df[id_col], is.na))
+  df[any_missing,] <- NULL
+
+  label <- unique(df[, label_col])
+
+  swap_flag <- FALSE
+
+  if (length(id_col) > 1) {
+    swap_flag <- TRUE
+
+    combined_id_col <-
+      Reduce(function(x, y) {
+        paste(x, y, sep = "_")
+      }, df[, id_col])
+    new_id <- paste(id_col, collapse = "_")
+    df[[new_id]] <- combined_id_col
+  } else {
+    new_id <- id_col
+  }
+
+  pb <- progress::progress_bar$new(total = nrow(unique(df[new_id])))
+
+  l <- lapply(unique(df[[new_id]]), function(x) {
+    pb$tick()
+
+    upper <- df[df[[new_id]] == x,]
+    label_col_lower <- setdiff(label, upper[label_col])
+
+    if (nrow(label_col_lower) == 0) {
+      return(upper)
+    }
+
+    if (swap_flag == TRUE) {
+      upper <- move_left(upper, c(new_id, id_col, label_col))
+
+      lr_ncol <-
+        ncol(df) - length(c(new_id, id_col, label_col))
+
+
+    } else {
+      upper <- move_left(upper, c(new_id, label_col))
+
+      lr_ncol <- ncol(df) - length(c(new_id, label_col))
+
+    }
+
+
+    #lower right artificial data
+    lr <-
+      do.call(cbind,
+              rep(list(rep(
+                fill_with, nrow(label_col_lower)
+              )),
+              lr_ncol))
+
+    #if id_col is of multiples, preserve original id_cols in the lower part as well
+    if (swap_flag == TRUE) {
+      lower <- cbind(rep(x, nrow(label_col_lower)),
+                     sapply(unique(upper[id_col]), function(x)
+                       rep(x, nrow(
+                         label_col_lower
+                       ))),
+                     label_col_lower,
+                     lr)
+    }
+
+    if (swap_flag == FALSE) {
+      lower <- cbind(rep(x, nrow(label_col_lower)),
+                     label_col_lower,
+                     lr)
+    }
+
+    names(lower) <- names(upper)
+
+    result <- rbind(upper, lower)
+
+    if (swap_flag == TRUE) {
+      result$new_id <- NULL
+    }
+
+    return(result)
+  })
+
+  do.call(rbind, l)
+}
+
+clean_by_id <- function(df, id_col, var_col=NULL, filter_col=FALSE, th=1){
+  #'Remove rows where id columns are all missing, and where all columns but the id columns are missing; (optional) Remove columns where there are missing values afterwards.
+  #'@param id_col numeric vector specify which columns are considered id columns
+  #'@param var_col numeric vector specify which columns are considered data columns
+  #'@param filter_col a bool, if TRUE then will leave only columns that does not contain missing - applies to all non id columns if var_col is NULL otherwise only applies to var_col only.
+  #'@param th a numeric, range from 0-1 to specify the threshold for amount least amount of non-missing data by column in fractions of total rows
+
+  dt <- data.table::as.data.table(df)
+
+  #row operation by id cols
+  row_no_ids <-
+    rowSums(is.na(dt[, id_col, with = FALSE])) == length(id_col)
+
+  if (any(row_no_ids)) {
+    dt <- dt[-row_no_ids,]
+  }
+
+  if (is.null(var_col)){
+    rhs <- dt[, -id_col, with = FALSE]
+  }
+
+  if(!is.null(var_col)){
+    rhs <- dt[, var_col, with = FALSE]
+  }
+
+  #row operation to rhs
+  row_all_na <- apply(rhs, 1, function(x){all(is.na(x))})
+
+  dt <- dt[!row_all_na, ]
+
+  if (filter_col==FALSE){
+    rhs <- rhs[!row_all_na, ]
+  }
+
+  #column operation to rhs
+  if (filter_col==TRUE){
+    #rhs may be different since entire-empty rows were removed
+    if (is.null(var_col)){
+      rhs <- dt[, -id_col, with = FALSE]
+    }
+
+    if(!is.null(var_col)){
+      rhs <- dt[, var_col, with = FALSE]
+    }
+
+    non_miss_pct <- sapply(rhs, function(x) {
+      sum(!is.na(x))/length(x)
+    })
+
+    rhs[, which(non_miss_pct<th)] <- NULL
+  }
+
+  if (is.null(rhs)){
+    message("rhs returns NULL, all columns contain at least 1 missing value")
+  }
+
+  dt <- cbind(dt[, id_col, with=FALSE], rhs)
+
+  return(dt)
 }
 
 # column names --------------------------------------------------------------------------------

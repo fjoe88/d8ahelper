@@ -223,6 +223,10 @@ load_csv <- function(file = 'r_output.csv',
   }
 
   if (load == TRUE) {
+    if(!grepl("\\.csv$", file)){
+      file <- paste0(file, ".csv")
+    }
+
     if (full_path == TRUE) {
       file = file
     } else {
@@ -327,6 +331,25 @@ load_files <- function(load_from,
   return(files)
 }
 
+
+#' R's base::file.copy can only copy a directory as a entirety to another directory
+#' to enable copy files to another directory
+#' allow re matching to copy only a subset of all files
+#'
+file.copy.content.only <- function(from,
+                                   to,
+                                   pattern = ".*",
+                                   overwrite = FALSE,
+                                   copy.mode = TRUE,
+                                   copy.date = FALSE){
+
+  list_of_files <- list.files(from, pattern)
+  file.copy(file.path(from,list_of_files),
+            to,
+            overwrite = overwrite,
+            copy.mode = copy.mode,
+            copy.date = copy.date)
+}
 
 
 # Encryption ----------------------------------------------------------------------------------

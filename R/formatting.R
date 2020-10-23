@@ -77,4 +77,15 @@ cap_str <- function(x, collapse = " ") {
         collapse=collapse)
 }
 
+# Date and time -----------------------------------------------------------
 
+
+#' Convert numerically converted format POSIXct time back to POSIXct datetime format
+secs_to_date <- function(secs) {
+  as.POSIXct(secs, origin = "1970-01-01")
+}
+
+days_to_date <- function(days){
+  secs <- days*(24*60*60)
+  as.POSIXct(secs, origin = "1970-01-01")
+}
