@@ -297,31 +297,57 @@ sum_missing <- function(df, num = 5, ...) {
   df_missing <- move_left(df_missing, "colname")
 }
 
-#'Examine if containing value
-#'@param x a vector or a list
-#'@example
-#'foo <- c(NA, NULL, "", "  ", "first value")
-#'contain_value(foo)
-#'which(contain_value(foo))
+#' examine if contains value
 #'
-contain_value <- function(x){
+#' @param x a vector or a list
+#' @example
+#' foo <- c(NA, NULL, "", "  ", "first value")
+#' contain_value(foo)
+#' which(contain_value(foo))
+contain_value <- function(x) {
 
   doesnt_contain_value <- function(x){
-    c1 <- is.null(x)
-    c2 <- is.na(x)
-    c3 <- grepl("^[[:space:]]?$", x)
-
-    return(any(c(c1, c2, c3)))
+    is.null(x) | is.na(x) | grepl("^[[:space:]]?$", x)
   }
 
-  #length(NULL) == 0
   if (length(x)<=1) {
     return(!doesnt_contain_value(x))
   }
 
-  sapply(x, function(y){
+  sapply(x, function(y) {
     !doesnt_contain_value(y)
-    })
+  })
 }
 
 
+#' Output summary of duplicated rows by given keys
+#' @param keys a character vector contains column names to be used for grouping
+#' @return a list, of which 'dups' is a subset dataframe contain only duplicated entries by group, 'dup_count' is a count summary by group, 'dup_row' is row index of duplicated rows by group, and 'dup_row_bool' is boolean of duplicated rows by group
+any_dups <- function(df, keys) {
+  df1 <- data.table::as.data.table(df)[, .N, by = keys]
+
+  df2 <- df1[N > 1, .SD, .SDcols = keys]
+
+  bool_list <- lapply(seq_along(df2), function(i) {
+    col_name <- names(df2)[[i]]
+    df[[col_name]] %in% df2[[i]]
+  })
+
+  dup_row_bool <- Reduce(`&`, bool_list)
+  dup_row <- which(dup_row_bool)
+
+  dups <- df[dup_row_bool,]
+
+  dup_count <- df[dup_row_bool, keys, with = FALSE]
+  dup_count <- dup_count[, N := .N, by = keys]
+
+  dup_count <- dup_count[dup_count[, .I[max(N)], by=keys]$V1] #getting row index of group max in N
+
+  list(
+    key = keys,
+    dups = dups,
+    dup_count = dup_count,
+    dup_row = dup_row,
+    dup_row_bool = dup_row_bool
+  )
+}
