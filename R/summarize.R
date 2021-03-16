@@ -324,7 +324,8 @@ contain_value <- function(x) {
 #' @param keys a character vector contains column names to be used for grouping
 #' @return a list, of which 'dups' is a subset dataframe contain only duplicated entries by group, 'dup_count' is a count summary by group, 'dup_row' is row index of duplicated rows by group, and 'dup_row_bool' is boolean of duplicated rows by group
 any_dups <- function(df, keys) {
-  df1 <- data.table::as.data.table(df)[, .N, by = keys]
+
+  df1 <- data.table::as.data.table(df)[, N := .N, by = keys]
 
   df2 <- df1[N > 1, .SD, .SDcols = keys]
 
