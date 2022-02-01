@@ -293,23 +293,25 @@ remove_duplicates <- function(df, ...) {
 
 #'Fill NAs and empty cells with fillers such as a character
 #'
-fill_na_as_missing <- function(df,
-                               fill = "[missing]") {
+fill_na_as_missing <- function(df, fill = "[missing]") {
   if (!is.data.frame(df)) {
     message('not a dataframe, return original')
     return(df)
   }
 
-  as.data.frame(sapply(df, function(col) {
-    if (is.character(col) | is.factor(col)) {
-      col[sapply(col, function(x) {
-        any(is.na(x), any(grep("^[[:space:]]*$", x)), x == 'NA')
-      })] <- fill
-    }
+  list_of_cols <-
+    d8ahelper::lapply_preserve_names(df, function(col) {
+      if (is.character(col) | is.factor(col)) {
+        col[sapply(col, function(x) {
+          any(is.na(x), any(grep("^[[:space:]]*$", x)), x == 'NA')
+        })] <- fill
+      }
 
-    return(col)
+      return(as.data.frame(col))
 
-  }))
+    })
+
+  return(do.call(cbind, list_of_cols))
 }
 
 #' Sister function to fill_na_as_missing, replace cells with NAs if match to certain string
