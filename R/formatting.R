@@ -77,6 +77,29 @@ cap_str <- function(x, collapse = " ") {
         collapse=collapse)
 }
 
+#'convert all columns of factor type to character type
+conv_fct_to_chr <- function(df) {
+  as.data.frame(sapply(df, function(col) {
+    if (is.factor(col)) {
+      col <- as.character(col)
+    }
+
+    return(col)
+
+  }))
+}
+
+#'convert all columns of character type to factor type
+conv_chr_to_fct <- function(df) {
+  as.data.frame(sapply(df, function(col) {
+    if (is.character(col)) {
+      col <- as.factor(col)
+    }
+
+    return(col)
+
+  }))
+}
 # Date and time -----------------------------------------------------------
 
 
