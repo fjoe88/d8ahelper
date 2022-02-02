@@ -296,25 +296,34 @@ fread2 <- function(file, ...) {
 load_files <- function(load_from,
                        pattern = "\\.csv$",
                        read_as_df = TRUE,
+                       use_fread = TRUE,
                        avoid = "^_|archive",
                        full.names = TRUE,
                        load = FALSE,
                        ...) {
 
   files <-
-    list.files(load_from, full.names = full.names, pattern = pattern, ...)
+    list.files(load_from, full.names = full.names, pattern = pattern)
   names(files) <-
     stringr::str_extract(list.files(load_from, full.names = FALSE, pattern = pattern),
-                "^[^\\.]*")
+                         "^[^\\.]*")
   files <- files[!grepl(avoid, names(files))]
 
   if (load == TRUE) {
     if (read_as_df == TRUE) {
       file.list <-
         lapply(as.list(files), function(x){
-          # readr::read_csv(x, col_types = cols())
-          df <- data.table::fread(x, na.strings = c("", "NA"))
-          df <- tibble::as_tibble(df)
+
+          if(use_fread == TRUE){
+            df <- data.table::fread(x, na.strings = c("", "NA"))
+            df <- tibble::as_tibble(df)
+          }
+
+          if (use_fread == FALSE){
+            read.csv(x, ...)
+            # df <- tibble::as_tibble(df)
+          }
+
         })
 
       return(file.list)
