@@ -188,6 +188,9 @@ remove_empty_rows <- function(df) {
 #' a wrapper function of d8ahelper::any_dups
 #' @param keys a character vector contains column names, for grouping purposes
 rm_dups_w_less_data <- function(df, keys){
+
+  df <- data.table::as.data.table(df)
+
   dups <- any_dups(df, keys = keys)
 
   dt <- data.table::as.data.table(df)
@@ -196,10 +199,12 @@ rm_dups_w_less_data <- function(df, keys){
 
   dt.dup <- dups$dups
 
-  sums <- apply(dt.dup[, -keys, with=FALSE], 1, function(row){
-    sum(d8ahelper::contain_value(row))
+  not_missing <- sapply(dt.dup[, -keys, with=FALSE], function(col){
+    is.na(col)|col==""
   })
+  sums <- apply(not_missing, 1, sum) #faster than using apply row-wise with test
 
+  #if multiple max exist, return first one
   .first_max <- function(...){
     if (!is.numeric(c(...))){
       stop('only accept numerics')
@@ -220,11 +225,12 @@ rm_dups_w_less_data <- function(df, keys){
 
   dt.dup[, .sums:=NULL]
 
-  message(glue::glue("{nrow(dups$dups)-nrow(dt.dup)} rows removed."))
+  message(glue::glue("{nrow(dups$dups)-nrow(dt.dup)} rows with duplicated keys({paste(dups$key, collapse=',')}) removed."))
 
   rbind(dt.uniq, dt.dup)
 
 }
+
 
 
 # missing, NAs --------------------------------------------------------------------------------
