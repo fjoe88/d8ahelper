@@ -306,16 +306,18 @@ sum_missing <- function(df, num = 5, ...) {
 #' which(contain_value(foo))
 contain_value <- function(x) {
 
-  doesnt_contain_value <- function(x){
-    is.null(x) | is.na(x) | grepl("^[[:space:]]?$", x)
+  .doesnt_contain_value <- function(x){
+    if (is.null(x)){return(TRUE)} else {
+      return(is.na(x) | grepl("^[[:space:]]?$", x))
+    }
   }
 
   if (length(x)<=1) {
-    return(!doesnt_contain_value(x))
+    return(!.doesnt_contain_value(x))
   }
 
   sapply(x, function(y) {
-    !doesnt_contain_value(y)
+    !.doesnt_contain_value(y)
   })
 }
 
