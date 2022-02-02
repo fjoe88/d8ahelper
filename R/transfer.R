@@ -361,6 +361,92 @@ file.copy.content.only <- function(from,
 }
 
 
+#' Perform a non intrusive inspection of a given directory and return a dataframe with essential file information sorted by file size
+insp_dir <- function(dir,
+                     recursive = TRUE,
+                     pattern = ".*",
+                     silence = TRUE) {
+  r_names <-
+    list.files(dir,
+               pattern = pattern,
+               recursive = recursive,
+               full.names = F)
+
+  if (length(r_names) == 0) {
+    print(glue::glue("all dirs and sub-dirs are empty within {dir}"))
+    return(NA)
+  }
+
+  f_names <-
+    list.files(dir,
+               pattern = pattern,
+               recursive = recursive,
+               full.names = T)
+
+  df <- data.frame(
+    "names" = stringr::str_remove_all(r_names, ".*/"),
+    "rel_file_name" = r_names,
+    "full_file_name" = f_names,
+    "size_mb" = sapply(f_names, function(x) {
+      round(file.info(x)$size / (1024 * 1024), digits = 2)
+    })
+  )
+
+  rownames(df) <- NULL
+
+  df <- df %>% arrange(-size_mb)
+
+  df <- df %>% mutate(
+    size = case_when(
+      size_mb > 2000 ~ "****",
+      size_mb > 1000 ~ "***",
+      size_mb > 100  ~ "**",
+      size_mb > 10   ~ "*",
+      TRUE ~ ""
+    )
+  )
+
+  df_p <- df %>%
+    select(rel_file_name, size_mb, size) %>%
+    filter(size_mb > 100)
+
+  if (silence == FALSE) {
+    print(df_p)
+  }
+
+  return(df)
+}
+
+#' given a directory, delete files given the regex pattern excluding files matching to 'avoid' arg
+#' @param pattern a regex string, used to match files to be deleted
+#' @param avoid a regular expression string, matched files will not be deleted
+
+clear_dir <- function(dir,
+                      pattern = ".csv",
+                      recursive = F,
+                      avoid = "^_") {
+
+  df <- insp_dir(dir,
+                 pattern = pattern,
+                 recursive = recursive)
+
+  if (!is.data.frame(df)) {
+    return(NA)
+  }
+
+  to_excl <- sapply(df$names, function(x){
+    grepl(x, pattern = avoid)
+  })
+
+  file_to_remove <- df$full_file_name[!to_excl]
+
+  #delete
+  sapply(file_to_remove, unlink)
+
+  return(file_to_remove)
+}
+
+
 # Encryption ----------------------------------------------------------------------------------
 
 #' A wrapper function for sodium::keygen to generate, convert keys
