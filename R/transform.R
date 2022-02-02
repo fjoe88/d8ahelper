@@ -149,6 +149,7 @@ multi_join <- function(list,
 
 #' Remove column(s) if containing a single unique value
 
+
 rm_single_unique_col <- function (df,
                                   threshold = 1,
                                   exclude = c())
@@ -157,23 +158,25 @@ rm_single_unique_col <- function (df,
     return(df)
   }
 
-  ids <- wafer::detect_all(df, return_loc = TRUE)
+  df <- data.table::as.data.table(df)
+
+  ids <- which(detect_id(df, combine_result = T))
 
   if (length(exclude) > 0) {
     ids_excl <- which(names(df) %in% exclude)
     ids <- union(ids, ids_excl)
   }
 
-  df1 <- df[, ids]
+  df1 <- df[, ids, with = FALSE]
   rest <- setdiff(seq_along(df), ids)
-  df2 <- df[, rest]
-  df2 <- df2[!sapply(df2, function(x)
-    all(is.na(x)))]
+  df2 <- df[, rest, with = FALSE]
+  df2 <- df2[, !sapply(df2, function(x){all(is.na(x))}), with = FALSE]
   uniq <- sapply(df2, function(x) {
     length(unique(x[!is.na(x)]))
   })
-  cbind(df1, df2[, !uniq %in% c(0:threshold)])
+  cbind(df1, df2[, !uniq %in% c(0:threshold), with=FALSE])
 }
+
 
 #' Remove row(s) if all values are NAs
 
