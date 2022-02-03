@@ -9,7 +9,7 @@
 #' @param all a boolean, trim non-leading/trailing white spaces as well if equals TRUE
 #' @param replacement a character to replace non-leading/trailing white spaces with
 
-trim_spaces <- function(x,
+trim_ws <- function(x,
                         leading = FALSE,
                         trailing = FALSE,
                         all = FALSE,
@@ -35,6 +35,21 @@ trim_spaces <- function(x,
   }
 
 }
+
+#' Remove leading and trailing whitespaces that are within any character or factor type columns of a data.frame
+
+trim_ws_df <- function(df) {
+  df[] <- lapply(df, function(col) {
+    if (is.character(col) | is.factor(col)) {
+      col <- sapply(col, trimws)
+    }
+
+    return(col)
+  })
+
+  return(df)
+}
+
 
 #' Move column or columns to far left hand side of a dataframe
 #'
