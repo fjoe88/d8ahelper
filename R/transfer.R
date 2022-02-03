@@ -16,89 +16,77 @@
 #'@example
 #'copy_unique(df = "apple banana apple orange", format_lotid = FALSE)
 
-copy_unique <-
-  function(df = paste(readClipboard(), collapse = ","),
-           col = "lotid",
-           sep = ",",
-           quotes = FALSE,
-           format_lotid = TRUE,
-           format_step = FALSE,
-           save_csv = FALSE,
-           ...) {
+copy_unique <- function(df = paste(readClipboard(), collapse = ","),
+                        col = "value",
+                        sep = ",",
+                        reduce_only = FALSE,
+                        fix_len = FALSE,
+                        quotes = FALSE,
+                        save_csv = FALSE,
+                        ...) {
 
-    if (!(is.character(df)|is.data.frame(df)))
-      stop("only data.frame objects or character vectors are accepted")
+  if (!(is.character(df)|is.data.frame(df)))
+    stop("only data.frame objects or character vectors are accepted")
 
-    if (is.data.frame(df)) {
-      if (tolower(col) == "lotid") {
-        df <- wafer::format_lotid(df)
-        df <- wafer::create_startlot(df)
+  if (is.data.frame(df)) {
+    unique.val <- unique(df[[col]])
+    str.to.copy <- paste(unique.val, collapse = sep)
+    utils::writeClipboard(str.to.copy)
+    return(df)
+
+  } else{
+
+    if (reduce_only == TRUE){
+      reduced_clip <- unique(readClipboard())
+
+      if (fix_len == TRUE){
+
+        max_len <- max(sapply(reduced_clip, function(x){nchar(as.character(x))}))
+
+        reduced_clip <- stringr::str_pad(reduced_clip, 7, pad = "0")
+
       }
-      unique.val <- unique(df[[col]])
-      str.to.copy <- paste(unique.val, collapse = sep)
-      utils::writeClipboard(str.to.copy)
-      return(df)
-
-    } else{
-
-      # early return if to format step names
-      if (format_step == TRUE){
-        dt <- data.table::setDT(stringr::str_split(df, ","))
-        dt <- unique(dt)
-
-        col = "step"
-        names(dt) <- col
-
-        if (quotes == TRUE) {
-          str <- paste(paste0("'", dt[[col]], "'"), collapse = ",")
-        }
-
-        utils::writeClipboard(str)
-        return(dt)
-      }
-
-      if (length(df) > 1) {
-        df = paste(df, collapse = ",")
-      }
-
-      # early return if nothing copied
-      if (!grepl("[[:alnum:]]", df)) {return()}
-
-      df <-
-        stringr::str_replace_all(df, pattern = "\\s+", replacement = ",")
-      df <-
-        stringr::str_replace_all(df, pattern = "\n", replacement = ",")
-      df <-
-        stringr::str_replace_all(df, pattern = "^,+|,+$", replacement = "")
-      df <-
-        stringr::str_replace_all(df, pattern = ",+", replacement = ",")
-
-      dt <- data.table::setDT(stringr::str_split(df, ","))
-
-      names(dt) <- col
-
-      if (format_lotid == TRUE) {
-        names(dt) <- "lotid"
-        dt <- wafer::format_lotid(dt)
-        dt <- wafer::create_startlot(dt)
-      }
-
-      if (quotes == TRUE) {
-        dt[[col]] <- paste0("'", dt[[col]], "'")
-      }
-
-      data.table::setkeyv(dt, col)
-      dt <- unique(dt)
-
-      utils::writeClipboard(paste(dt[[col]], collapse = sep))
-
-      if (save_csv == TRUE) {
-        d8ahelper::save_csv(dt, file.name = "lot_list.csv")
-      }
-
-      return(dt)
+      writeClipboard(reduced_clip)
+      return(reduced_clip)
     }
+
+    if (length(df) > 1) {
+      df = paste(df, collapse = ",")
+    }
+
+    # early return if nothing copied
+    if (!grepl("[[:alnum:]]", df)) {return()}
+
+    df <-
+      stringr::str_replace_all(df, pattern = "\\s+", replacement = ",")
+    df <-
+      stringr::str_replace_all(df, pattern = "\n", replacement = ",")
+    df <-
+      stringr::str_replace_all(df, pattern = "^,+|,+$", replacement = "")
+    df <-
+      stringr::str_replace_all(df, pattern = ",+", replacement = ",")
+
+    dt <- data.table::setDT(stringr::str_split(df, ","))
+
+    names(dt) <- col
+
+
+    if (quotes == TRUE) {
+      dt[[col]] <- paste0("'", dt[[col]], "'")
+    }
+
+    data.table::setkeyv(dt, col)
+    dt <- unique(dt)
+
+    utils::writeClipboard(paste(dt[[col]], collapse = sep))
+
+    if (save_csv == TRUE) {
+      d8ahelper::save_csv(dt, file.name = "lot_list.csv")
+    }
+
+    return(dt)
   }
+}
 
 
 #' A custom way to output CSV files
