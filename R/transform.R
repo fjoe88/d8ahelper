@@ -338,9 +338,9 @@ fill_na_as_missing <- function(df, fill = "[missing]") {
   return(do.call(cbind, list_of_cols))
 }
 
-#' Sister function to fill_na_as_missing, replace cells with NAs if match to certain string
+#' Sister function to fill_na_as_missing, replace cells with NAs if match to given string
 
-fill_missing_as_na <- function(df, pattern = "[missing]") {
+fill_as_na <- function(df, pattern = "[missing]") {
 
 
   df[df == pattern] <- NA
