@@ -490,7 +490,7 @@ clean_by_id <- function(df, id_col, var_col=NULL, filter_col=FALSE, th=1){
     }
 
     non_miss_pct <- sapply(rhs, function(x) {
-      sum(!is.na(x))/length(x)
+      sum(!(is.na(x) | grepl(x, pattern = "//s+") | x=="")) / length(x)
     })
 
     rhs[, which(non_miss_pct<th)] <- NULL
