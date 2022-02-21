@@ -107,6 +107,22 @@ subset_by_quantile <- function(df,
            df[[col]] <= quantile(df[[col]], 1 - top, na.rm = TRUE))
 }
 
+
+#' Append empty rows to a dataframe to make row number a target number
+#'
+#' @param n a numeric, the number of rows of the outcome table after filling missing rows
+
+add_empty_rows <- function(df, n) {
+  new.row <- rep(NA, length = ncol(df))
+  new.row <- rbind(new.row)
+  m <- length(df[[1]])
+  to.append <-
+    as.data.frame(new.row[rep(1:nrow(new.row), length = n - m), , drop = FALSE])
+  names(to.append) <- names(df)
+  new.df <- rbind(df, to.append, use.names = FALSE)
+}
+
+
 # join -----------------------------------------------------------------------------------
 
 #' Coalescely join x, y data frames, for columns of same names, append y values to x if rows that are missing value
@@ -162,8 +178,7 @@ multi_join <- function(list,
 # redundant rows/columns ----------------------------------------------------------------------
 
 
-#' Remove column(s) if containing a single unique value
-
+#' Remove column(s) that contain a single unique value
 
 rm_single_unique_col <- function (df,
                                   threshold = 1,
@@ -252,6 +267,20 @@ rm_dups_w_less_data <- function(df, keys){
 
 
 # missing, NAs --------------------------------------------------------------------------------
+
+#' Insert(inject) NAs as replacement randomly to a data
+#'
+#' @param df a data frame
+#' @param percent percent of NAs per column
+#' @return a data frame
+#' @example
+#' foo <- insert_nas(mtcars, percent = 0.1)
+
+insert_nas <- function(df, percent = 0.2) {
+  as.data.frame(lapply(df, function(x) {
+    "is.na<-"(x, sample(seq(x), floor(length(x) * runif(1, 0, percent))))
+  }))
+}
 
 #' Remove duplicated rows of the original data frame, or a subset of if column names being passed in
 
@@ -354,7 +383,6 @@ fill_as_na <- function(df, pattern = "[missing]") {
 #' tidyr::crossing and tidyr::expand.grid perform similar function but do require loading up tidyr package first
 #'
 
-
 puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   df <- as.data.frame(df)
 
@@ -445,7 +473,7 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
 }
 
 clean_by_id <- function(df, id_col, var_col=NULL, filter_col=FALSE, th=1){
-  #'Remove rows where id columns are all missing, and where all columns but the id columns are missing; (optional) Remove columns where there are missing values afterwards.
+  #'Remove rows where id columns are all missing, and rows where all columns but the id columns are missing; (optional) Remove columns where all rows are of missing values.
   #'@param id_col numeric vector specify which columns are considered id columns
   #'@param var_col numeric vector specify which columns are considered data columns
   #'@param filter_col a bool, if TRUE then will leave only columns that does not contain missing - applies to all non id columns if var_col is NULL otherwise only applies to var_col only.
@@ -584,34 +612,3 @@ str_find <- function(str,
   }
 }
 
-# Others --------------------------------------------------------------------------------------
-
-
-#' Append empty rows to a dataframe to make row number a target number
-#'
-#' @param n a numeric, the number of rows of the outcome table after filling missing rows
-
-add_empty_rows <- function(df, n) {
-  new.row <- rep(NA, length = ncol(df))
-  new.row <- rbind(new.row)
-  m <- length(df[[1]])
-  to.append <-
-    as.data.frame(new.row[rep(1:nrow(new.row), length = n - m), , drop = FALSE])
-  names(to.append) <- names(df)
-  new.df <- rbind(df, to.append, use.names = FALSE)
-}
-
-
-#' Insert(inject) NAs as replacement randomly to a data
-#'
-#' @param df a data frame
-#' @param percent percent of NAs per column
-#' @return a data frame
-#' @example
-#' foo <- insert_nas(mtcars, percent = 0.1)
-
-insert_nas <- function(df, percent = 0.2) {
-  as.data.frame(lapply(df, function(x) {
-    "is.na<-"(x, sample(seq(x), floor(length(x) * runif(1, 0, percent))))
-  }))
-}

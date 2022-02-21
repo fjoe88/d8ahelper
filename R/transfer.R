@@ -231,7 +231,7 @@ load_csv <- function(file = 'r_output.csv',
   }
 }
 
-#' Wrapper function for convinient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
+#' Wrapper function for convenient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
 
 from_excel <- function(header = TRUE) {
   read.table(file = "clipboard", sep = "\t", header = header)

@@ -297,7 +297,7 @@ sum_missing <- function(df, num = 5, ...) {
   df_missing <- move_left(df_missing, "colname")
 }
 
-#' examine if contains value
+#' examine if a data holder contains 'value' in a pre-defined term
 #'
 #' @param x a vector or a list
 #' @example
