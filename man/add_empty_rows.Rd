@@ -2,10 +2,13 @@
 % Please edit documentation in R/transform.R
 \name{add_empty_rows}
 \alias{add_empty_rows}
-\title{Append empty rows to a dataframe to make row number = n}
+\title{Append empty rows to a dataframe to make row number a target number}
 \usage{
 add_empty_rows(df, n)
 }
+\arguments{
+\item{n}{a numeric, the number of rows of the outcome table after filling missing rows}
+}
 \description{
-Append empty rows to a dataframe to make row number = n
+Append empty rows to a dataframe to make row number a target number
 }

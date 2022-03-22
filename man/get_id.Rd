@@ -2,10 +2,10 @@
 % Please edit documentation in R/transform.R
 \name{get_id}
 \alias{get_id}
-\title{sister function to convert/revert col name for retrieving column id based on name(s)}
+\title{sister function to encode_col, retrieve column id based on name(s)}
 \usage{
 get_id(df, ...)
 }
 \description{
-sister function to convert/revert col name for retrieving column id based on name(s)
+sister function to encode_col, retrieve column id based on name(s)
 }

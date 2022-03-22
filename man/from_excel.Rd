@@ -2,10 +2,10 @@
 % Please edit documentation in R/transfer.R
 \name{from_excel}
 \alias{from_excel}
-\title{Wrapper function for convinient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)}
+\title{Wrapper function for convenient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)}
 \usage{
 from_excel(header = TRUE)
 }
 \description{
-Wrapper function for convinient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
+Wrapper function for convenient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
 }

@@ -4,9 +4,16 @@
 \alias{copy_unique}
 \title{Copy unique values to clipboard.}
 \usage{
-copy_unique(df = paste(readClipboard(), collapse = ","), col = "lotid",
-  sep = ",", quotes = FALSE, format_lotid = TRUE,
-  format_step = FALSE, save_csv = FALSE, ...)
+copy_unique(
+  df = paste(readClipboard(), collapse = ","),
+  col = "value",
+  sep = ",",
+  reduce_only = FALSE,
+  fix_len = FALSE,
+  quotes = FALSE,
+  save_csv = FALSE,
+  ...
+)
 }
 \arguments{
 \item{df}{a character string copied from clipboard, or a dataframe column}

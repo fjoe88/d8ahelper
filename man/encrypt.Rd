@@ -2,10 +2,10 @@
 % Please edit documentation in R/transfer.R
 \name{encrypt}
 \alias{encrypt}
-\title{A wrapper function for encrypting/delete file using key}
+\title{A wrapper function to encrypt file using a key}
 \usage{
-encrypt(file, dest, key = gen_key(), keep.original = FALSE)
+encrypt(file_orig, file_enc, key_file)
 }
 \description{
-A wrapper function for encrypting/delete file using key
+A wrapper function to encrypt file using a key
 }

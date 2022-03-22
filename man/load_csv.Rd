@@ -2,10 +2,16 @@
 % Please edit documentation in R/transfer.R
 \name{load_csv}
 \alias{load_csv}
-\title{Fast way to load CSV files}
+\title{A custom way to load CSV files}
 \usage{
-load_csv(file = "r_output.csv", path = here::here("r_output"),
-  folder = "", full_path = FALSE, load = TRUE, ...)
+load_csv(
+  file = "r_output.csv",
+  path = here::here("r_output"),
+  folder = "",
+  full_path = FALSE,
+  load = TRUE,
+  ...
+)
 }
 \arguments{
 \item{path}{target folder, by default use 'r_output' folder under root directory}
@@ -17,5 +23,5 @@ load_csv(file = "r_output.csv", path = here::here("r_output"),
 \item{file.name}{character name for output file name}
 }
 \description{
-Fast way to load CSV files
+A custom way to load CSV files
 }

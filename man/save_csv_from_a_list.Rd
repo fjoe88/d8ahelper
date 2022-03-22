@@ -2,10 +2,16 @@
 % Please edit documentation in R/transfer.R
 \name{save_csv_from_a_list}
 \alias{save_csv_from_a_list}
-\title{a wrapper function of save_csv that applies to a list of data frames}
+\title{A wrapper function of save_csv that applies to a list of data frames}
 \usage{
-save_csv_from_a_list(lst, overwrite = FALSE, ...)
+save_csv_from_a_list(
+  lst,
+  overwrite = FALSE,
+  use_name = FALSE,
+  use_clean_names = TRUE,
+  ...
+)
 }
 \description{
-a wrapper function of save_csv that applies to a list of data frames
+A wrapper function of save_csv that applies to a list of data frames
 }

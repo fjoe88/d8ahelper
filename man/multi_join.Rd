@@ -2,10 +2,10 @@
 % Please edit documentation in R/transform.R
 \name{multi_join}
 \alias{multi_join}
-\title{sister function to coalesce_join, join together a list of data frames}
+\title{Wrapper function to coalesce_join, join together a list of data frames}
 \usage{
 multi_join(list, by = NULL, join = dplyr::full_join, ...)
 }
 \description{
-sister function to coalesce_join, join together a list of data frames
+Wrapper function to coalesce_join, join together a list of data frames
 }

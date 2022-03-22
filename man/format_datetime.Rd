@@ -4,7 +4,7 @@
 \alias{format_datetime}
 \title{Format datetime columns to a specified format}
 \usage{
-format_datetime(df, regex, timeformat, ...)
+format_datetime(df, regex, timeformat = "\%Y/\%m/\%d \%H:\%M:\%S \%p", ...)
 }
 \arguments{
 \item{df}{a data frame}

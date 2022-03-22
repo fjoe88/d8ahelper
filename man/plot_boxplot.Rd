@@ -4,8 +4,16 @@
 \alias{plot_boxplot}
 \title{boxplot with confidence intervals and summary statistics such as p-val and risk}
 \usage{
-plot_boxplot(num, grp = NULL, data = NULL, anova = TRUE,
-  alpha = 0.05, verbose = TRUE, plot_only = TRUE, ...)
+plot_boxplot(
+  num,
+  grp = NULL,
+  data = NULL,
+  anova = TRUE,
+  alpha = 0.05,
+  verbose = TRUE,
+  plot_only = TRUE,
+  ...
+)
 }
 \description{
 boxplot with confidence intervals and summary statistics such as p-val and risk

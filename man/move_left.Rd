@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{move_left}
 \alias{move_left}
-\title{Move column to far left hand side}
+\title{Move column or columns to far left hand side of a dataframe}
 \usage{
 move_left(df, str)
 }

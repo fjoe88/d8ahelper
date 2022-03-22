@@ -2,10 +2,10 @@
 % Please edit documentation in R/transform.R
 \name{rm_single_unique_col}
 \alias{rm_single_unique_col}
-\title{Remove column(s) if containing a single unique value}
+\title{Remove column(s) that contain a single unique value}
 \usage{
-rm_single_unique_col(df, threshold = 1)
+rm_single_unique_col(df, threshold = 1, exclude = c())
 }
 \description{
-Remove column(s) if containing a single unique value
+Remove column(s) that contain a single unique value
 }

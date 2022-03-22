@@ -2,10 +2,10 @@
 % Please edit documentation in R/summarize.R
 \name{ff_quantile}
 \alias{ff_quantile}
-\title{function factory for nth quantile}
+\title{Function factory to create nth quantile function}
 \usage{
 ff_quantile(num)
 }
 \description{
-function factory for nth quantile
+Function factory to create nth quantile function
 }

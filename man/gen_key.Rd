@@ -2,10 +2,10 @@
 % Please edit documentation in R/transfer.R
 \name{gen_key}
 \alias{gen_key}
-\title{A wrapper function for generating, store, and read key}
+\title{A wrapper function for sodium::keygen to generate, convert keys}
 \usage{
-gen_key(file = ".key", key.wrap = TRUE)
+gen_key(key_file, convert_to_sodium_key = FALSE)
 }
 \description{
-A wrapper function for generating, store, and read key
+A wrapper function for sodium::keygen to generate, convert keys
 }

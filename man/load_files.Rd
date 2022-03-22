@@ -4,10 +4,20 @@
 \alias{load_files}
 \title{load files paths in specified location}
 \usage{
-load_files(loc, pattern = ".csv", read_as_df = TRUE,
-  avoid = "^_|archive", full.names = TRUE, load = FALSE, ...)
+load_files(
+  load_from,
+  pattern = "\\\\.csv$",
+  read_as_df = TRUE,
+  use_fread = TRUE,
+  avoid = "^_|archive",
+  full.names = TRUE,
+  load = FALSE,
+  ...
+)
 }
 \arguments{
+\item{load_from}{a path for where files are load from}
+
 \item{read_as_df}{a logical, if to read as data frame, else read as text}
 
 \item{load}{a logical for if actually read the files; if pattern is not ".csv", then read as text}

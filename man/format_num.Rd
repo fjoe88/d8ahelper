@@ -2,7 +2,7 @@
 % Please edit documentation in R/formatting.R
 \name{format_num}
 \alias{format_num}
-\title{Trim numbers to 2 digit after decimal point format}
+\title{Format numbers to limit digits after decimal point}
 \usage{
 format_num(num, digits = 2, ...)
 }

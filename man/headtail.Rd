@@ -4,7 +4,7 @@
 \alias{headtail}
 \title{A quick glance into a dataframe combining n head and tail rows}
 \usage{
-headtail(df, n = 5)
+headtail(df, n = 5, simplify = TRUE)
 }
 \arguments{
 \item{n}{number of top/bottom rows to include, or number of characters in case of a string}

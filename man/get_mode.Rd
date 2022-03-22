@@ -2,10 +2,10 @@
 % Please edit documentation in R/summarize.R
 \name{get_mode}
 \alias{get_mode}
-\title{get mode of a vector}
+\title{Get the mode of a vector}
 \usage{
 get_mode(x, na.rm = TRUE)
 }
 \description{
-get mode of a vector
+Get the mode of a vector
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/transform.R
 \name{fill_na_as_missing}
 \alias{fill_na_as_missing}
-\title{Fill NAs with fillers}
+\title{Fill NAs and empty cells with fillers such as a character}
 \usage{
-fill_na_as_missing(df, fill = "[missing]", convert_fct_to_chr = TRUE)
+fill_na_as_missing(df, fill = "[missing]")
 }
 \description{
-Fill NAs with fillers
+Fill NAs and empty cells with fillers such as a character
 }

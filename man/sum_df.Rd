@@ -2,12 +2,10 @@
 % Please edit documentation in R/summarize.R
 \name{sum_df}
 \alias{sum_df}
-\title{sister function to sum_col and sum_row
-returns a list}
+\title{Sister function to sum_col and sum_row, returns a list of results from each}
 \usage{
 sum_df(df)
 }
 \description{
-sister function to sum_col and sum_row
-returns a list
+Sister function to sum_col and sum_row, returns a list of results from each
 }

@@ -2,10 +2,10 @@
 % Please edit documentation in R/summarize.R
 \name{sum_row}
 \alias{sum_row}
-\title{generate row-wise summary for missing and unique values}
+\title{Generate row-wise summary for missing and unique values}
 \usage{
 sum_row(df)
 }
 \description{
-generate row-wise summary for missing and unique values
+Generate row-wise summary for missing and unique values
 }

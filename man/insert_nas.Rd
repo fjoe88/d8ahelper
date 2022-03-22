@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{insert_nas}
 \alias{insert_nas}
-\title{Insert NAs randomly to a data.frame}
+\title{Insert(inject) NAs as replacement randomly to a data}
 \usage{
 insert_nas(df, percent = 0.2)
 }
@@ -15,5 +15,5 @@ insert_nas(df, percent = 0.2)
 a data frame
 }
 \description{
-Insert NAs randomly to a data.frame
+Insert(inject) NAs as replacement randomly to a data
 }

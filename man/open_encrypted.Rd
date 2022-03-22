@@ -2,10 +2,19 @@
 % Please edit documentation in R/transfer.R
 \name{open_encrypted}
 \alias{open_encrypted}
-\title{A wrapper function for the workflow of decryption, source and encryption of a '.R' file}
+\title{A wrapper function for the workflow of decrypt, source and encrypt back files}
 \usage{
-open_encrypted(file_actual, file_encrypted, encrypt = FALSE)
+open_encrypted(
+  file_actual,
+  file_encrypted,
+  encrypt = FALSE,
+  key_file,
+  file_type = "r"
+)
+}
+\arguments{
+\item{encrypt}{a bool, if TRUE then encrypt the file with key_file}
 }
 \description{
-A wrapper function for the workflow of decryption, source and encryption of a '.R' file
+A wrapper function for the workflow of decrypt, source and encrypt back files
 }

@@ -2,11 +2,18 @@
 % Please edit documentation in R/transfer.R
 \name{save_csv}
 \alias{save_csv}
-\title{Fast way to output CSV files}
+\title{A custom way to output CSV files}
 \usage{
-save_csv(df, file.name = "r_output.csv", path = here::here("r_output"),
-  time_as_chr = FALSE, folder = "", overwrite = FALSE,
-  use_readr = FALSE, ...)
+save_csv(
+  df,
+  file.name = "r_output.csv",
+  path = here::here("r_output"),
+  folder = "",
+  overwrite = FALSE,
+  use_readr = FALSE,
+  as_chr = TRUE,
+  ...
+)
 }
 \arguments{
 \item{df}{a data frame}
@@ -15,9 +22,9 @@ save_csv(df, file.name = "r_output.csv", path = here::here("r_output"),
 
 \item{path}{ouput folder, by default use 'r_output' folder under root directory}
 
-\item{time_as_chr}{specify if to convert datetime columns to character before export}
-
 \item{folder}{specify output folder under 'path'}
+
+\item{time_as_chr}{specify if to convert datetime columns to character before export}
 }
 \description{
 Will copy file path to clipboard for convinient file locate or remove (via unlink())

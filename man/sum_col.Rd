@@ -4,7 +4,7 @@
 \alias{sum_col}
 \title{Summarize a data frame with concise and useful summary statistics}
 \usage{
-sum_col(df, outlier_method = "z", thres = 3, ...)
+sum_col(df, outlier_method = "z", thres = 3, view = TRUE, ...)
 }
 \arguments{
 \item{df}{a data frame}
