@@ -15,5 +15,7 @@ Imports:
     tidyverse,
     modelr,
     glue,
-    here
+    here,
+    sodium,
+    cyphr
 RoxygenNote: 7.1.2
