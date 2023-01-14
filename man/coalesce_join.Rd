@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{coalesce_join}
 \alias{coalesce_join}
-\title{Coalescely join x, y data frames, for columns of same names, append y values to x if rows that are missing value}
+\title{Coalescence join x, y data frames, for columns of same names, append y values to x if rows that are missing value}
 \usage{
 coalesce_join(
   x,
@@ -14,5 +14,5 @@ coalesce_join(
 )
 }
 \description{
-Coalescely join x, y data frames, for columns of same names, append y values to x if rows that are missing value
+Coalescence join x, y data frames, for columns of same names, append y values to x if rows that are missing value
 }

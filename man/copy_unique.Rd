@@ -24,8 +24,10 @@ copy_unique(
 a comma separated string w/ duplicates removed and a dataframe of unique values
 }
 \description{
-1) if input is a dataframe, do not return back a df \cr
-2) by default will assume lotids being copied and format them unless set format_lotid = FALSE \cr
-3) if format_step == TRUE, return a comma separated step name string instead \cr
-4) if save_csv == TRUE, will save output to '1.lot_list.csv' \cr
+\enumerate{
+\item if input is a dataframe, do not return back a df \cr
+\item by default will assume lotids being copied and format them unless set format_lotid = FALSE \cr
+\item if format_step == TRUE, return a comma separated step name string instead \cr
+\item if save_csv == TRUE, will save output to '1.lot_list.csv' \cr
+}
 }

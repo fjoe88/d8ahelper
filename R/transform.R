@@ -1,5 +1,6 @@
 
 
+
 # transform -----------------------------------------------------------------------------------
 
 #' Remove leading and trailing white spaces
@@ -10,10 +11,10 @@
 #' @param replacement a character to replace non-leading/trailing white spaces with
 
 trim_ws <- function(x,
-                        leading = FALSE,
-                        trailing = FALSE,
-                        all = FALSE,
-                        replacement = "_") {
+                    leading = FALSE,
+                    trailing = FALSE,
+                    all = FALSE,
+                    replacement = "_") {
   if (leading == FALSE &&
       trailing == FALSE) {
     x <- gsub("^\\s+|\\s+$", "", x)
@@ -57,17 +58,18 @@ trim_ws_df <- function(df) {
 #' @param df a data frame
 #' @param str column name(s)
 #' @examples
-#' View(move_left(mtcars, "wt"))
-#' View(move_left(mtcars, c("gear", "carb", "wt")))
+#' move_left(mtcars, "wt")
+#' move_left(mtcars, c("gear", "carb", "wt"))
 
 move_left <- function(df, str) {
   str <- intersect(str, names(df)) #to preserve order by str
-  if (length(str) >= 1){
+  if (length(str) >= 1) {
     col.indx.part1 <- sapply(seq_along(str), function(i) {
       which(str[i] == names(df))
     })
 
-    col.indx.part2 <- seq_len(ncol(df))[!seq_len(ncol(df)) %in% col.indx.part1]
+    col.indx.part2 <-
+      seq_len(ncol(df))[!seq_len(ncol(df)) %in% col.indx.part1]
     df <- df[, c(col.indx.part1, col.indx.part2)]
   } else {
     message("No matching columns found, return original data frame")
@@ -78,8 +80,6 @@ move_left <- function(df, str) {
 #Add week, weekday, month, year columns based on datetime column
 
 add_wmy <- function(df, dt_col) {
-
-
   if (is.POSIXct(df[[dt_col]])) {
     df$dWeek <- as.factor(weekdays(df[[dt_col]]))
 
@@ -101,7 +101,6 @@ subset_by_quantile <- function(df,
                                top = 0,
                                bottom = 0,
                                ...) {
-
   df %>%
     filter(df[[col]] >= quantile(df[[col]], bottom, na.rm = TRUE),
            df[[col]] <= quantile(df[[col]], 1 - top, na.rm = TRUE))
@@ -125,7 +124,14 @@ add_empty_rows <- function(df, n) {
 
 # join -----------------------------------------------------------------------------------
 
-#' Coalescely join x, y data frames, for columns of same names, append y values to x if rows that are missing value
+#' Coalescence join x, y data frames, for columns of same names, append y values to x if rows that are missing value
+#'
+#' @param x
+#' @param y
+#' @param by
+#' @param suffix
+#' @param join
+#' @param ...
 
 coalesce_join <- function(x,
                           y,
@@ -200,11 +206,14 @@ rm_single_unique_col <- function (df,
   df1 <- df[, ids, with = FALSE]
   rest <- setdiff(seq_along(df), ids)
   df2 <- df[, rest, with = FALSE]
-  df2 <- df2[, !sapply(df2, function(x){all(is.na(x))}), with = FALSE]
+  df2 <-
+    df2[,!sapply(df2, function(x) {
+      all(is.na(x))
+    }), with = FALSE]
   uniq <- sapply(df2, function(x) {
     length(unique(x[!is.na(x)]))
   })
-  cbind(df1, df2[, !uniq %in% c(0:threshold), with=FALSE])
+  cbind(df1, df2[,!uniq %in% c(0:threshold), with = FALSE])
 }
 
 
@@ -220,32 +229,32 @@ remove_empty_rows <- function(df) {
 #' if multiple observations sharing equal number of most non-missing data columns, choose the first one by row index
 #' a wrapper function of d8ahelper::any_dups
 #' @param keys a character vector contains column names, for grouping purposes
-rm_dups_w_less_data <- function(df, keys){
-
+rm_dups_w_less_data <- function(df, keys) {
   df <- data.table::as.data.table(df)
 
   dups <- any_dups(df, keys = keys)
 
   dt <- data.table::as.data.table(df)
 
-  dt.uniq <- dt[!dups$dup_row_bool, ]
+  dt.uniq <- dt[!dups$dup_row_bool,]
 
   dt.dup <- dups$dups
 
-  not_missing <- sapply(dt.dup[, -keys, with=FALSE], function(col){
-    is.na(col)|col==""
+  not_missing <- sapply(dt.dup[,-keys, with = FALSE], function(col) {
+    is.na(col) | col == ""
   })
-  sums <- apply(not_missing, 1, sum) #faster than using apply row-wise with test
+  sums <-
+    apply(not_missing, 1, sum) #faster than using apply row-wise with test
 
   #if multiple max exist, return first one
-  .first_max <- function(...){
-    if (!is.numeric(c(...))){
+  .first_max <- function(...) {
+    if (!is.numeric(c(...))) {
       stop('only accept numerics')
     }
 
     bool <- c(...) == max(...)
 
-    if (sum(bool) > 1){
+    if (sum(bool) > 1) {
       bool[which(bool)[-1]] <- FALSE
     }
 
@@ -254,11 +263,15 @@ rm_dups_w_less_data <- function(df, keys){
 
   dt.dup$.sums <- sums
 
-  dt.dup <- dt.dup[dt.dup[, .I[.first_max(.sums)], by=keys]$V1]
+  dt.dup <- dt.dup[dt.dup[, .I[.first_max(.sums)], by = keys]$V1]
 
-  dt.dup[, .sums:=NULL]
+  dt.dup[, .sums := NULL]
 
-  message(glue::glue("{nrow(dups$dups)-nrow(dt.dup)} rows with duplicated keys({paste(dups$key, collapse=',')}) removed."))
+  message(
+    glue::glue(
+      "{nrow(dups$dups)-nrow(dt.dup)} rows with duplicated keys({paste(dups$key, collapse=',')}) removed."
+    )
+  )
 
   rbind(dt.uniq, dt.dup)
 
@@ -293,10 +306,10 @@ rm_na <- function(x) {
 remove_duplicates <- function(df, ...) {
   if (missing(...)) {
     print(names(df))
-    df1 <- unique(df[, ])
+    df1 <- unique(df[,])
     df2 <- purrr::transpose(df1)
 
-    df3 <- purrr::transpose(df[, ])
+    df3 <- purrr::transpose(df[,])
 
     df4 <-
       as.data.frame(sapply(df2, function(m) {
@@ -306,15 +319,15 @@ remove_duplicates <- function(df, ...) {
 
     names(df4) <- "count"
     df5 <- cbind(df4, df1)
-    df6 <- df5[order(df5$count, decreasing = TRUE), ]
-    df7 <- df6[which(df6$count > 1), ]
+    df6 <- df5[order(df5$count, decreasing = TRUE),]
+    df7 <- df6[which(df6$count > 1),]
 
     print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
     print(d8ahelper::headtail(df7))
     print(glue::glue(
       "Output dataframe of {nrow(df5)} rows containing no duplicates"
     ))
-    df5[, !(names(df5) == "count")]
+    df5[,!(names(df5) == "count")]
 
   } else {
     df1 <- unique(df[, c(...)])
@@ -330,16 +343,16 @@ remove_duplicates <- function(df, ...) {
 
     names(df4) <- "count"
     df5 <- cbind(df4, df1)
-    df6 <- df5[order(df5$count, decreasing = TRUE), ]
+    df6 <- df5[order(df5$count, decreasing = TRUE),]
 
-    df7 <- df6[which(df6$count > 1), ]
+    df7 <- df6[which(df6$count > 1),]
 
     print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
     print(d8ahelper::headtail(df7))
     print(glue::glue(
       "Output dataframe of {nrow(df5)} rows containing no duplicates"
     ))
-    df5[, !(names(df5) == "count")]
+    df5[,!(names(df5) == "count")]
 
   }
 }
@@ -370,8 +383,6 @@ fill_na_as_missing <- function(df, fill = "[missing]") {
 #' Sister function to fill_na_as_missing, replace cells with NAs if match to given string
 
 fill_as_na <- function(df, pattern = "[missing]") {
-
-
   df[df == pattern] <- NA
   df
 }
@@ -387,7 +398,7 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   df <- as.data.frame(df)
 
   any_missing <- Reduce("|", lapply(df[id_col], is.na))
-  df[any_missing,] <- NULL
+  df[any_missing, ] <- NULL
 
   label <- unique(df[, label_col])
 
@@ -406,12 +417,12 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
     new_id <- id_col
   }
 
-  pb <- progress::progress_bar$new(total = nrow(unique(df[new_id])))
+  #pb <- progress::progress_bar$new(total = nrow(unique(df[new_id])))
 
   l <- lapply(unique(df[[new_id]]), function(x) {
-    pb$tick()
+    #pb$tick()
 
-    upper <- df[df[[new_id]] == x,]
+    upper <- df[df[[new_id]] == x, ]
     label_col_lower <- setdiff(label, upper[label_col])
 
     if (nrow(label_col_lower) == 0) {
@@ -472,74 +483,79 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   do.call(rbind, l)
 }
 
-clean_by_id <- function(df, id_col, var_col=NULL, filter_col=FALSE, th=1){
-  #'Remove rows where id columns are all missing, and rows where all columns but the id columns are missing; (optional) Remove columns where all rows are of missing values.
-  #'@param id_col numeric vector specify which columns are considered id columns
-  #'@param var_col numeric vector specify which columns are considered data columns
-  #'@param filter_col a bool, if TRUE then will leave only columns that does not contain missing - applies to all non id columns if var_col is NULL otherwise only applies to var_col only.
-  #'@param th a numeric, range from 0-1 to specify the threshold for amount least amount of non-missing data by column in fractions of total rows
+clean_by_id <-
+  function(df,
+           id_col,
+           var_col = NULL,
+           filter_col = FALSE,
+           th = 1) {
+    #'Remove rows where id columns are all missing, and rows where all columns but the id columns are missing; (optional) Remove columns where all rows are of missing values.
+    #'@param id_col numeric vector specify which columns are considered id columns
+    #'@param var_col numeric vector specify which columns are considered data columns
+    #'@param filter_col a bool, if TRUE then will leave only columns that does not contain missing - applies to all non id columns if var_col is NULL otherwise only applies to var_col only.
+    #'@param th a numeric, range from 0-1 to specify the threshold for amount least amount of non-missing data by column in fractions of total rows
 
-  dt <- data.table::as.data.table(df)
+    dt <- data.table::as.data.table(df)
 
-  #row operation by id cols
-  row_no_ids <-
-    rowSums(is.na(dt[, id_col, with = FALSE])) == length(id_col)
+    #row operation by id cols
+    row_no_ids <-
+      rowSums(is.na(dt[, id_col, with = FALSE])) == length(id_col)
 
-  if (any(row_no_ids)) {
-    dt <- dt[-row_no_ids,]
-  }
-
-  if (is.null(var_col)){
-    rhs <- dt[, -id_col, with = FALSE]
-  }
-
-  if(!is.null(var_col)){
-    rhs <- dt[, var_col, with = FALSE]
-  }
-
-  #row operation to rhs
-  row_all_na <- apply(rhs, 1, function(x){all(is.na(x))})
-
-  dt <- dt[!row_all_na, ]
-
-  if (filter_col==FALSE){
-    rhs <- rhs[!row_all_na, ]
-  }
-
-  #column operation to rhs
-  if (filter_col==TRUE){
-    #rhs may be different since entire-empty rows were removed
-    if (is.null(var_col)){
-      rhs <- dt[, -id_col, with = FALSE]
+    if (any(row_no_ids)) {
+      dt <- dt[-row_no_ids, ]
     }
 
-    if(!is.null(var_col)){
+    if (is.null(var_col)) {
+      rhs <- dt[,-id_col, with = FALSE]
+    }
+
+    if (!is.null(var_col)) {
       rhs <- dt[, var_col, with = FALSE]
     }
 
-    non_miss_pct <- sapply(rhs, function(x) {
-      sum(!(is.na(x) | grepl(x, pattern = "//s+") | x=="")) / length(x)
+    #row operation to rhs
+    row_all_na <- apply(rhs, 1, function(x) {
+      all(is.na(x))
     })
 
-    rhs[, which(non_miss_pct<th)] <- NULL
+    dt <- dt[!row_all_na,]
+
+    if (filter_col == FALSE) {
+      rhs <- rhs[!row_all_na,]
+    }
+
+    #column operation to rhs
+    if (filter_col == TRUE) {
+      #rhs may be different since entire-empty rows were removed
+      if (is.null(var_col)) {
+        rhs <- dt[,-id_col, with = FALSE]
+      }
+
+      if (!is.null(var_col)) {
+        rhs <- dt[, var_col, with = FALSE]
+      }
+
+      non_miss_pct <- sapply(rhs, function(x) {
+        sum(!(is.na(x) | grepl(x, pattern = "//s+") | x == "")) / length(x)
+      })
+
+      rhs[, which(non_miss_pct < th)] <- NULL
+    }
+
+    if (is.null(rhs)) {
+      message("rhs returns NULL, all columns contain at least 1 missing value")
+    }
+
+    dt <- cbind(dt[, id_col, with = FALSE], rhs)
+
+    return(dt)
   }
-
-  if (is.null(rhs)){
-    message("rhs returns NULL, all columns contain at least 1 missing value")
-  }
-
-  dt <- cbind(dt[, id_col, with=FALSE], rhs)
-
-  return(dt)
-}
 
 # column names --------------------------------------------------------------------------------
 
 #' Replace column names with alpha-numeric sequences, returns a named vector (of name-value pairs) for column name look-up; Returns a list.
 
 encode_col <- function(df) {
-
-
   dict <- names(df)
   names(dict) <- paste0("c", seq_along(df))
 
@@ -557,8 +573,6 @@ encode_col <- function(df) {
 #' @param df: data frame to convert names from, default to df within df.list
 
 decode_col <- function(df.list, df = df.list$df) {
-
-
   names(df) <- sapply(names(df), function(x)
     df.list$tag[[x]])
   df
@@ -611,4 +625,3 @@ str_find <- function(str,
     return(substr(str, start_loc, end_loc))
   }
 }
-

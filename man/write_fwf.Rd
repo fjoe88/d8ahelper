@@ -3,11 +3,11 @@
 \name{write_fwf}
 \alias{write_fwf}
 \title{via @haozhu233 (on GitHub)
- write fixed width format text file}
+write fixed width format text file}
 \usage{
 write_fwf(dt, file, width, justify = "l", replace_na = "NA")
 }
 \description{
 via @haozhu233 (on GitHub)
- write fixed width format text file
+write fixed width format text file
 }
