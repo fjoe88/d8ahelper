@@ -12,7 +12,13 @@ LazyData: true
 Imports:
     lubridate,
     data.table,
-    tidyverse,
+    future,
+    dplyr,
+    tidyr,
+    readr,
+    magrittr,
+    purrr,
+    furrr,
     modelr,
     glue,
     here

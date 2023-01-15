@@ -354,3 +354,31 @@ any_dups <- function(df, keys) {
     dup_row_bool = dup_row_bool
   )
 }
+
+#count number of lines without using read_csv
+#read n lines at a time
+count_lines = function(filepath, batch = 1000) {
+  con = file(filepath, "r")
+  n = 0
+  while (TRUE) {
+    lines = readLines(con, n = batch)
+    present = length(lines)
+    n = n + present
+    if (present <  batch) {
+      break
+    }
+  }
+  close(con)
+  return(n)
+}
+
+df_to_txt <- function(df) {
+  #convert dataframe to text output
+  foo <- lapply(seq_len(nrow(df)), function(i) {
+    return(paste(df[i,], collapse = "\t"))
+  })
+  title_row <- paste(names(df), collapse = "\t")
+  txt <- paste(c(title_row, foo), collapse = "\n")
+  return(txt)
+}
+

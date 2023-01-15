@@ -40,15 +40,10 @@ trim_ws <- function(x,
 #' Remove leading and trailing whitespaces that are within any character or factor type columns of a data.frame
 
 trim_ws_df <- function(df) {
-  df[] <- lapply(df, function(col) {
-    if (is.character(col) | is.factor(col)) {
-      col <- sapply(col, trimws)
-    }
-
-    return(col)
-  })
-
-  return(df)
+  if (!is.data.frame(df)) {
+    stop("[trim_ws_df]: input not a dataframe")
+  }
+  as.data.frame(lapply(df, trim_ws))
 }
 
 
@@ -185,9 +180,17 @@ multi_join <- function(list,
 
 
 #' Remove column(s) that contain a single unique value
+#'
+#' @param df
+#' @param threshold
+#' @param na_as_a_cat
+#' @param exclude
+#' @example
+#' rm_single_unique_col(data.frame(a = c("a", "a", "b"), b = c(NA, NA, NA), c=c(1,1,1)), exclude = "b")
 
 rm_single_unique_col <- function (df,
                                   threshold = 1,
+                                  na_as_a_cat = TRUE,
                                   exclude = c())
 {
   if (length(df) <= 1 | !is.data.frame(df)) {
@@ -196,24 +199,38 @@ rm_single_unique_col <- function (df,
 
   df <- data.table::as.data.table(df)
 
-  ids <- which(detect_id(df, combine_result = T))
+  # ids <- which(detect_id(df, combine_result = T))
+  #
+  # if (length(exclude) > 0) {
+  #   ids_excl <- which(names(df) %in% exclude)
+  #   ids <- union(ids, ids_excl)
+  # }
 
-  if (length(exclude) > 0) {
-    ids_excl <- which(names(df) %in% exclude)
-    ids <- union(ids, ids_excl)
-  }
+  ids_excl <- which(names(df) %in% exclude)
+  ids <- ids_excl
 
   df1 <- df[, ids, with = FALSE]
   rest <- setdiff(seq_along(df), ids)
   df2 <- df[, rest, with = FALSE]
-  df2 <-
-    df2[,!sapply(df2, function(x) {
-      all(is.na(x))
-    }), with = FALSE]
-  uniq <- sapply(df2, function(x) {
-    length(unique(x[!is.na(x)]))
-  })
-  cbind(df1, df2[,!uniq %in% c(0:threshold), with = FALSE])
+  df2 <- df2[, !sapply(df2, function(x) {
+    all(is.na(x))
+  }), with = FALSE]
+
+  if (na_as_a_cat == FALSE) {
+    uniq <- sapply(df2, function(x) {
+      length(unique(x[!is.na(x)]))
+    })
+  }
+
+  if (na_as_a_cat == TRUE) {
+    uniq <- sapply(df2, function(x) {
+      length(unique(x))
+    })
+  }
+
+
+  df3 <- cbind(df1, df2[, !uniq %in% c(0:threshold), with = FALSE])
+  return(df3)
 }
 
 
@@ -228,21 +245,30 @@ remove_empty_rows <- function(df) {
 #' Remove duplicated rows by leaving only 1 observation per each group of most non-missing data columns
 #' if multiple observations sharing equal number of most non-missing data columns, choose the first one by row index
 #' a wrapper function of d8ahelper::any_dups
+#'
+#' @param df
 #' @param keys a character vector contains column names, for grouping purposes
+#'
+#' @example
+#' rm_dups_w_less_data(data.frame(a=c("a", "a", "b", "b"), b=c(NA,2,3,3)), "a")
 rm_dups_w_less_data <- function(df, keys) {
-  df <- data.table::as.data.table(df)
-
-  dups <- any_dups(df, keys = keys)
-
   dt <- data.table::as.data.table(df)
+
+  dups <- any_dups(dt, keys = keys)
 
   dt.uniq <- dt[!dups$dup_row_bool,]
 
   dt.dup <- dups$dups
 
-  not_missing <- sapply(dt.dup[,-keys, with = FALSE], function(col) {
-    is.na(col) | col == ""
-  })
+  not_missing <-
+    sapply(dt.dup[,-keys, with = FALSE], function(col) {
+      if (!mode(col) %in% c("character", "factor")) {
+        return(!(is.na(as.numeric(col)) | as.numeric(col) == ""))
+      }
+
+      return(!(is.na(col) | col == ""))
+    })
+
   sums <-
     apply(not_missing, 1, sum) #faster than using apply row-wise with test
 
@@ -357,26 +383,83 @@ remove_duplicates <- function(df, ...) {
   }
 }
 
-#'Fill NAs and empty cells with fillers such as a character
+#' Taken a list of data frames, remove duplicazte columns that exist across multiple dataframes
 #'
-fill_na_as_missing <- function(df, fill = "[missing]") {
+#' @param df_list
+#'
+#' @return
+#' @export
+#'
+#' @examples
+remove_dup_cols <- function(df_list) {
+
+  all_col_names <- Reduce(c, sapply(df_list, names))
+
+  occ_times <-
+    sapply(all_col_names, function(x)
+      sum(x == all_col_names))
+
+  col_more_than_one <- unique(all_col_names[occ_times > 1])
+  col_kept <- character()
+
+  new_list_of_df <- list()
+
+  for (n in seq_along(df_list)) {
+    df <- df_list[[n]]
+
+    matched_cols <- intersect(names(df), col_more_than_one)
+    id_cols <- names(df)[detect_id(df, combine_result = T)]
+
+    #leave alone id cols
+    matched_cols <- setdiff(matched_cols, id_cols)
+
+    if (length(matched_cols) > 0) {
+      for (col in matched_cols) {
+        if (col %in% col_kept) {
+          df[[col]] <- NULL
+          print(glue::glue("data.frame #{n}: {col} removed"))
+        } else {
+          col_kept <- append(col_kept, col)
+        }
+      }
+    }
+
+    new_list_of_df[[n]] <- df
+  }
+
+  return(new_list_of_df)
+}
+
+
+#' Fill NAs and empty cells with fillers such as a character
+#'
+#' @param df
+#' @param pat
+#' @param fill
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fill_na_as_missing <- function (df,
+                                pat = "^(\\s*\\[missing\\]\\s*|\\s*|NA|)$",
+                                fill = "-")
+{
   if (!is.data.frame(df)) {
-    message('not a dataframe, return original')
+    message("not a dataframe, return original")
     return(df)
   }
 
+  pb <- progress::progress_bar$new(total = ncol(df))
   list_of_cols <-
     d8ahelper::lapply_preserve_names(df, function(col) {
-      if (is.character(col) | is.factor(col)) {
-        col[sapply(col, function(x) {
-          any(is.na(x), any(grep("^[[:space:]]*$", x)), x == 'NA')
-        })] <- fill
+      # if(is.list(col)){col_tmp <- col[[1]]}
+      if (is.character(col[[1]]) | is.factor(col[[1]])) {
+        col[[1]][is.na(col[[1]]) | grepl(pat, col[[1]])] <- fill
       }
-
+      pb$tick()
       return(as.data.frame(col))
-
     })
-
   return(do.call(cbind, list_of_cols))
 }
 
@@ -385,6 +468,34 @@ fill_na_as_missing <- function(df, fill = "[missing]") {
 fill_as_na <- function(df, pattern = "[missing]") {
   df[df == pattern] <- NA
   df
+}
+
+#' Fill literal 'missing' or 'NA' with NAs
+#'
+#' @param df
+#' @param fill
+#' @param pat
+#'
+#' @return
+#' @export
+#'
+#' @examples
+fill_missing_as_na <- function(df,
+                               fill = NA,
+                               pat = "^(\\s*\\[missing\\]\\s*|\\s*|NA|)$") {
+  if (!is.data.frame(df)) {
+    message("not a dataframe, return original")
+    return(df)
+  }
+  list_of_cols <-
+    d8ahelper::lapply_preserve_names(df, function(col) {
+      # if(is.list(col)){col_tmp <- col[[1]]}
+      if (is.character(col[[1]]) | is.factor(col[[1]])) {
+        col[[1]][grepl(pat, col[[1]])] <- fill
+      }
+      return(as.data.frame(col))
+    })
+  return(do.call(cbind, list_of_cols))
 }
 
 
@@ -550,6 +661,26 @@ clean_by_id <-
 
     return(dt)
   }
+
+#' find columns that has at minimum 'th' number of non-NA values and fill missings with upper above closest non-NA value
+#'
+#' @param df
+#' @param th threshold value used to identify columns with minimal number of unique value count, if min value < th then add to target column list
+#' @param direction
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' fill_cols(data.frame(a=c(1, NA, 1, NA), b=c(1,1, 1, NA), b=c(1, 1, NA, NA)), th = 2)
+
+fill_cols <- function(df, th = 1, direction = "down") {
+  vals <- names(df)[sapply(df, function(x)
+    sum(!is.na(x)) <= th)]
+  df <- as_tibble(df)
+  df <- fill(df, one_of(vals), .direction = "down")
+  return(df)
+}
 
 # column names --------------------------------------------------------------------------------
 
