@@ -6,6 +6,9 @@
 \usage{
 trim_ws_df(df)
 }
+\arguments{
+\item{df}{a data.frame}
+}
 \description{
 Remove leading and trailing whitespaces that are within any character or factor type columns of a data.frame
 }

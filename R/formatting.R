@@ -8,6 +8,7 @@
 #' @param ...
 #' @param format default to "f" which gives numbers in the usual xxx.xxx format. see help(formatC)
 #'
+#' @export
 #' @example
 #' format_to_percentage(0.32)
 
@@ -26,6 +27,7 @@ format_to_percentage <- function(x,
 #' @param num
 #' @param digits
 #' @param ...
+#' @export
 #'
 #' @example
 #' format_num(3.1415926)
@@ -48,6 +50,7 @@ format_num <-
 #' @param df a data frame
 #' @param regex a character used for regular expression lookup of matching columns to format with
 #' @param timeformat datetime format to be used for formating columns with (see 'help(strptime)')
+#' @export
 #'
 #' @example
 #' format_datetime(data.frame(a=c(1,2), date=c(Sys.time(), Sys.time()-3600)), "date")
@@ -72,6 +75,10 @@ format_datetime <- function (df,
 }
 
 #' Capitalize the first letter of each word in the string
+#'
+#' @param x
+#' @param collapse
+#' @export
 #'
 #' @example
 #' cap_str("a WOrd CAPITALIZED,   with extra   spaces,with no leading space")
@@ -104,6 +111,7 @@ conv_fct_to_chr <- function(df) {
 #'convert all columns of character type to factor type
 #'
 #' @param df
+#' @export
 #'
 #' @example
 #' conv_chr_to_fct(data.frame(a=c("a","a","b"),b=c(1,2,3)))
@@ -123,6 +131,7 @@ conv_chr_to_fct <- function(df) {
 #' Convert numerically converted format POSIXct time back to POSIXct datetime format
 #'
 #' @param secs
+#' @export
 #'
 #' @example
 #' secs_to_date(1622342600)

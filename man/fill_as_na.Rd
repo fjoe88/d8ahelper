@@ -2,10 +2,10 @@
 % Please edit documentation in R/transform.R
 \name{fill_as_na}
 \alias{fill_as_na}
-\title{Sister function to fill_na_as_missing, replace cells with NAs if match to given string}
+\title{Sister func to fill_na_as_missing, replace cells with NAs if match to given string}
 \usage{
 fill_as_na(df, pattern = "[missing]")
 }
 \description{
-Sister function to fill_na_as_missing, replace cells with NAs if match to given string
+Sister func to fill_na_as_missing, replace cells with NAs if match to given string
 }

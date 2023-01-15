@@ -1,7 +1,4 @@
 
-
-# Transfer ------------------------------------------------------------------------------------
-
 #'Copy unique values to clipboard.
 #'
 #'1) if input is a dataframe, do not return back a df \cr

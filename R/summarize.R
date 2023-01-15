@@ -1,6 +1,4 @@
 
-# Summarize ---------------------------------------------------------------------------------
-
 #' A quick glance into a dataframe combining n head and tail rows
 #'
 #' @param n number of top/bottom rows to include, or number of characters in case of a string
@@ -13,23 +11,23 @@
 headtail <- function(df, n = 5, simplify = TRUE) {
   if (is.data.frame(df)) {
     if (nrow(df) <= 2 * n) {
-      head(df, nrow(df))
+      utils::head(df, nrow(df))
     } else {
       skip.row <- as.data.frame(matrix(data = "...", ncol = ncol(df)))
       row.names(skip.row) <-
         glue::glue("(skip {nrow(df)-2*n} rows)")
       names(skip.row) <- names(df)
 
-      rbind(head(df, n), skip.row, tail(df, n))
+      rbind(utils::head(df, n), skip.row, utils::tail(df, n))
     }
   } else if (is.character(df)) {
     result <- sapply(df, function(x) {
       if (nchar(x) <= 2 * n) {
         x
       } else {
-        head <- stringr::str_extract(x, paste0("^(.){", n, "}"))
-        tail <- stringr::str_extract(x, paste0("(.){", n, "}$"))
-        paste(head, tail, sep = " ... ")
+        head_part <- stringr::str_extract(x, paste0("^(.){", n, "}"))
+        tail_part <- stringr::str_extract(x, paste0("(.){", n, "}$"))
+        paste(head_part, tail_part, sep = " ... ")
       }
     })
 
@@ -37,7 +35,7 @@ headtail <- function(df, n = 5, simplify = TRUE) {
       names(result) <- NULL
     }
 
-    result
+    return(result)
 
   }
 }
@@ -64,7 +62,7 @@ get_mode <- function(x, na.rm = TRUE) {
 
 ff_quantile <- function(num){
   function(x, ...) {
-    quantile(x, num, ...)
+    stats::quantile(x, num, ...)
   }
 }
 

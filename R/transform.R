@@ -1,14 +1,14 @@
 
-
-
-# transform -----------------------------------------------------------------------------------
-
 #' Remove leading and trailing white spaces
 #'
 #' By default, trim both leading and traling white spaces unless specified
 #' @param x a character
 #' @param all a boolean, trim non-leading/trailing white spaces as well if equals TRUE
 #' @param replacement a character to replace non-leading/trailing white spaces with
+#' @export
+#' @example
+#' trim_ws("   a Chelsea player   ")
+#' trim_ws("   Didier Drogba   ", all=T, replacement = "-")
 
 trim_ws <- function(x,
                     leading = FALSE,
@@ -38,12 +38,15 @@ trim_ws <- function(x,
 }
 
 #' Remove leading and trailing whitespaces that are within any character or factor type columns of a data.frame
+#'
+#' @export
+#' @param df a data.frame
 
 trim_ws_df <- function(df) {
   if (!is.data.frame(df)) {
     stop("[trim_ws_df]: input not a dataframe")
   }
-  as.data.frame(lapply(df, trim_ws))
+  as.data.frame(lapply(df, d8ahelper::trim_ws))
 }
 
 
@@ -52,6 +55,7 @@ trim_ws_df <- function(df) {
 #' Accept multiple columns if passed in a character vector containing column names
 #' @param df a data frame
 #' @param str column name(s)
+#' @export
 #' @example
 #' move_left(mtcars, "wt")
 #' move_left(mtcars, c("gear", "carb", "wt"))
@@ -72,10 +76,19 @@ move_left <- function(df, str) {
   }
 }
 
-#Add week, weekday, month, year columns based on datetime column
 
+
+#' Add week, weekday, month, year columns based on datetime column
+#'
+#' @param df
+#' @param dt_col
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_wmy <- function(df, dt_col) {
-  if (is.POSIXct(df[[dt_col]])) {
+  if (lubridate::is.POSIXct(df[[dt_col]])) {
     df$dWeek <- as.factor(weekdays(df[[dt_col]]))
 
     df$WW <- lubridate::isoweek(df[[dt_col]] - 327600)
@@ -89,8 +102,20 @@ add_wmy <- function(df, dt_col) {
   }
 }
 
-# Filter column by removing points beyond top and(or) bottom percentage thresholds
 
+
+#' Filter column by removing points beyond top and(or) bottom percentage thresholds
+#'
+#' @param df
+#' @param col
+#' @param top
+#' @param bottom
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 subset_by_quantile <- function(df,
                                col,
                                top = 0,
@@ -104,16 +129,22 @@ subset_by_quantile <- function(df,
 
 #' Append empty rows to a dataframe to make row number a target number
 #'
+#' @param df
 #' @param n a numeric, the number of rows of the outcome table after filling missing rows
+#' @export
+#' @example
+#' add_empty_rows(data_frame(a=c(1,2,3), b=c("a","b","c")), n = 5)
 
 add_empty_rows <- function(df, n) {
+  browser()
   new.row <- rep(NA, length = ncol(df))
   new.row <- rbind(new.row)
   m <- length(df[[1]])
   to.append <-
     as.data.frame(new.row[rep(1:nrow(new.row), length = n - m), , drop = FALSE])
   names(to.append) <- names(df)
-  new.df <- rbind(df, to.append, use.names = FALSE)
+  new.df <- rbind(df, to.append)
+  return(new.df)
 }
 
 
@@ -127,6 +158,7 @@ add_empty_rows <- function(df, n) {
 #' @param suffix
 #' @param join
 #' @param ...
+#' @export
 
 coalesce_join <- function(x,
                           y,
@@ -134,14 +166,14 @@ coalesce_join <- function(x,
                           suffix = c(".x", ".y"),
                           join = dplyr::left_join,
                           ...) {
-  x <- x %>%
-    select(-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
+  x <-
+    select(x, -c(names(.)[str_count(names(.), ".x|.y") >= 1]))
 
-  y <- y %>%
-    select(-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
+  y <-
+    select(y, -c(names(.)[str_count(names(.), ".x|.y") >= 1]))
 
-  joined <- join(x, y, by = by, suffix = suffix, ...) %>%
-    select(-c(names(.)[str_count(names(.), ".x|.y") >= 2]))
+  joined <- join(x, y, by = by, suffix = suffix, ...)
+  joined <- select(joined, -c(names(.)[str_count(names(.), ".x|.y") >= 2]))
 
   # names of desired output
   cols <- union(names(x), names(y))
@@ -163,6 +195,12 @@ coalesce_join <- function(x,
 }
 
 #' Wrapper function to coalesce_join, join together a list of data frames
+#'
+#' @param list
+#' @param by
+#' @param join
+#' @param ...
+#' @export
 
 multi_join <- function(list,
                        by = NULL,
@@ -185,6 +223,7 @@ multi_join <- function(list,
 #' @param threshold
 #' @param na_as_a_cat
 #' @param exclude
+#' @export
 #' @example
 #' rm_single_unique_col(data.frame(a = c("a", "a", "b"), b = c(NA, NA, NA), c=c(1,1,1)), exclude = "b")
 
@@ -235,6 +274,9 @@ rm_single_unique_col <- function (df,
 
 
 #' Remove row(s) if all values are NAs
+#'
+#' @param df
+#' @export
 
 remove_empty_rows <- function(df) {
   if (!is.data.frame(df))
@@ -248,6 +290,7 @@ remove_empty_rows <- function(df) {
 #'
 #' @param df
 #' @param keys a character vector contains column names, for grouping purposes
+#' @export
 #'
 #' @example
 #' rm_dups_w_less_data(data.frame(a=c("a", "a", "b", "b"), b=c(NA,2,3,3)), "a")
@@ -312,8 +355,9 @@ rm_dups_w_less_data <- function(df, keys) {
 #' @param df a data frame
 #' @param percent percent of NAs per column
 #' @return a data frame
+#' @export
 #' @example
-#' foo <- insert_nas(mtcars, percent = 0.1)
+#' insert_nas(mtcars, percent = 0.1)
 
 insert_nas <- function(df, percent = 0.2) {
   as.data.frame(lapply(df, function(x) {
@@ -325,10 +369,21 @@ insert_nas <- function(df, percent = 0.2) {
 
 #' Remove NAs given a vector
 #'
+#' @param x
+#' @export
 rm_na <- function(x) {
   x[!is.na(x)]
 }
 
+#' Remove duplicated rows
+#'
+#' @param df
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 remove_duplicates <- function(df, ...) {
   if (missing(...)) {
     print(names(df))
@@ -463,7 +518,11 @@ fill_na_as_missing <- function (df,
   return(do.call(cbind, list_of_cols))
 }
 
-#' Sister function to fill_na_as_missing, replace cells with NAs if match to given string
+#' Sister func to fill_na_as_missing, replace cells with NAs if match to given string
+#'
+#' @param df
+#' @param pattern
+#' @export
 
 fill_as_na <- function(df, pattern = "[missing]") {
   df[df == pattern] <- NA
@@ -504,6 +563,11 @@ fill_missing_as_na <- function(df,
 #' Will move id columns and label columns to the far left
 #' tidyr::crossing and tidyr::expand.grid perform similar function but do require loading up tidyr package first
 #'
+#' @param df
+#' @param id_col
+#' @param label_col
+#' @param fill_with
+#' @export
 
 puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   df <- as.data.frame(df)
@@ -594,17 +658,24 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   do.call(rbind, l)
 }
 
+#' Remove rows where id columns are all missing, and rows where all columns but the id columns are missing; (optional) Remove columns where all rows are of missing values.
+#'
+#' @param df
+#' @param id_col numeric vector specify which columns are considered id columns
+#' @param var_col numeric vector specify which columns are considered data columns
+#' @param filter_col a bool, if TRUE then will leave only columns that does not contain missing - applies to all non id columns if var_col is NULL otherwise only applies to var_col only.
+#' @param th a numeric, range from 0-1 to specify the threshold for amount least amount of non-missing data by column in fractions of total rows
+#'
+#' @return
+#' @export
+#'
+#' @examples
 clean_by_id <-
   function(df,
            id_col,
            var_col = NULL,
            filter_col = FALSE,
            th = 1) {
-    #'Remove rows where id columns are all missing, and rows where all columns but the id columns are missing; (optional) Remove columns where all rows are of missing values.
-    #'@param id_col numeric vector specify which columns are considered id columns
-    #'@param var_col numeric vector specify which columns are considered data columns
-    #'@param filter_col a bool, if TRUE then will leave only columns that does not contain missing - applies to all non id columns if var_col is NULL otherwise only applies to var_col only.
-    #'@param th a numeric, range from 0-1 to specify the threshold for amount least amount of non-missing data by column in fractions of total rows
 
     dt <- data.table::as.data.table(df)
 
@@ -685,6 +756,9 @@ fill_cols <- function(df, th = 1, direction = "down") {
 # column names --------------------------------------------------------------------------------
 
 #' Replace column names with alpha-numeric sequences, returns a named vector (of name-value pairs) for column name look-up; Returns a list.
+#'
+#' @param df
+#' @export
 
 encode_col <- function(df) {
   dict <- names(df)
@@ -697,11 +771,12 @@ encode_col <- function(df) {
 
 }
 
-#' Sister function to encode_col
+#' Sister func to encode_col
 #' returns a data frame with original column names based on df$dict
 #'
 #' @param df.list: list object generated from d8ahelper::convert_col_name
 #' @param df: data frame to convert names from, default to df within df.list
+#' @export
 
 decode_col <- function(df.list, df = df.list$df) {
   names(df) <- sapply(names(df), function(x)
@@ -709,50 +784,32 @@ decode_col <- function(df.list, df = df.list$df) {
   df
 }
 
+#' get names of encoded obj, sister func to encode_col, retrieve column names based on ids
+#'
+#' @param df
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_name <- function(df, ...) {
-  #' sister function to encode_col, retrieve column names based on id(s)
 
   sapply(..., function(x)
     df$tag[[x]])
 }
 
+#' get id from encoded obj, sister func to encode_col, retrieve column id based on names
+#'
+#' @param df
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_id <- function(df, ...) {
-  #' sister function to encode_col, retrieve column id based on name(s)
 
   sapply(..., function(x)
     names(df$tag)[df$tag == x])
-}
-
-# regular expressions -------------------------------------------------------------------------
-
-str_find <- function(str,
-                     start,
-                     end,
-                     replacement,
-                     return_loc = FALSE) {
-  #'wrapper function for locate a string based on regex leading to and after it
-  #'@param str a string to search from
-  #'@param start a regex string that lead to the string of interest
-  #'@param end a regex string that is after the strin gof interest
-  #'@param replacement a string to replace the located string, optional.
-  #'@return_loc a logical, if TRUE then return character start/end location instead of the string itself
-  #'
-  start_loc <- stringr::str_locate(str, start)[[2]] + 1
-  end_loc <- stringr::str_locate(str, end)[[1]] - 1
-
-  if (return_loc == TRUE) {
-    return(c("start" = start_loc,
-             "end" = end_loc))
-  }
-
-  if (hasArg(replacement)) {
-    part1 <- substr(str, 1, start_loc - 1)
-    part2 <- replacement
-    part3 <- substr(str, end_loc + 1, nchar(str))
-    return(paste0(part1, part2, part3))
-  }
-
-  if (!hasArg(replacement)) {
-    return(substr(str, start_loc, end_loc))
-  }
 }

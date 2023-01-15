@@ -6,6 +6,9 @@
 \usage{
 list_files_fwd_slash(path = readr::clipboard(), return_str = TRUE, ...)
 }
+\arguments{
+\item{...}{}
+}
 \description{
 wraper function list.files to allow coppied windows path format containing backward slashes
 }

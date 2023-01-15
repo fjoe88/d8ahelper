@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{decode_col}
 \alias{decode_col}
-\title{Sister function to encode_col
+\title{Sister func to encode_col
 returns a data frame with original column names based on df$dict}
 \usage{
 decode_col(df.list, df = df.list$df)
@@ -13,6 +13,6 @@ decode_col(df.list, df = df.list$df)
 \item{df:}{data frame to convert names from, default to df within df.list}
 }
 \description{
-Sister function to encode_col
+Sister func to encode_col
 returns a data frame with original column names based on df$dict
 }

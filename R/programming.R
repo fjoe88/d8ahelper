@@ -1,8 +1,14 @@
+
+#' lapply wrapper but preserve object names as the name suggests
+#'
+#' @param list
+#' @param fun
+#'
+#' @return
+#' @export
+#'
+#' @examples
 lapply_preserve_names <- function(list, fun){
-  #' lapply wrapper, but preserve object names
-  #'
-  #' base lapply function give access to only the element of the vector but not other attributes
-  #' such as name
 
   lapply(seq_along(list), function(i) {
     obj = list[i]
@@ -11,7 +17,15 @@ lapply_preserve_names <- function(list, fun){
   })
 }
 
-#use future
+# lapply wrapper but preserve object names, use future package to add parallel processing
+#'
+#' @param list
+#' @param fun
+#'
+#' @return
+#' @export
+#'
+#' @examples
 lapply_preserve_names_use_future <- function (list, fun)
 {
   future.apply::future_lapply(
@@ -25,8 +39,17 @@ lapply_preserve_names_use_future <- function (list, fun)
   )
 }
 
+#' wraper function list.files to allow coppied windows path format containing backward slashes
+#'
+#' @param path
+#' @param return_str
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 list_files_fwd_slash <- function(path = readr::clipboard(), return_str = TRUE, ...) {
-  #' wraper function list.files to allow coppied windows path format containing backward slashes
 
   path <- stringr::str_replace_all(path, "\\\\+", "/")
 
@@ -37,10 +60,26 @@ list_files_fwd_slash <- function(path = readr::clipboard(), return_str = TRUE, .
   }
 }
 
+#' check if is factor or charactor
+#'
+#' @param x
+#'
+#' @return
+#' @export
+#'
+#' @examples
 is_fct_or_chr <- function(x) {
   is.factor(x) | is.character(x)
 }
 
+#' get directory size
+#'
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
 get_dir_size <- function(path) {
   print(path)
   files <- list.files(path, full.names = T, recursive = T)
@@ -62,6 +101,14 @@ get_dir_size <- function(path) {
   return(df)
 }
 
+#' list directory sizes
+#'
+#' @param root_dir
+#'
+#' @return
+#' @export
+#'
+#' @examples
 list_dir_sizes <- function(root_dir) {
   folders <- list.files(root_dir, full.names = T, recursive = F)
 
@@ -78,21 +125,45 @@ list_dir_sizes <- function(root_dir) {
   return(df1)
 }
 
-
-map_preserve_names_use_future <- function (list, fun)
-{
-  furrr::future_map(seq_along(list), function(i) {
-    obj = list[i]
-    names(obj) = names(list)[i]
-    fun(obj)
-  })
-}
-
+#' map but preserve object names
+#'
+#' @param list
+#' @param fun
+#'
+#' @return
+#' @export
+#'
+#' @example
+#' map_preserve_names(list(a=1, b=2), function(x)x+1)
+#' map_preserve_names(list(a=c(1,2,3), b=c(2,3,4)), sum)
 map_preserve_names <- function (list, fun)
 {
   purrr::map(seq_along(list), function(i) {
-    obj = list[i]
-    names(obj) = names(list)[i]
-    fun(obj)
+    obj = list[i][[1]]
+    return_obj <- fun(obj)
+    names(return_obj) = names(list)[i]
+    return(return_obj)
+  })
+}
+
+
+#' map but preserve object names, use future to add parallel processing
+#'
+#' @param list
+#' @param fun
+#'
+#' @return
+#' @export
+#'
+#' @example
+#' map_preserve_names_use_future(list(a=1, b=2), function(x)x+1)
+#' map_preserve_names_use_future(list(a=c(1,2,3), b=c(2,3,4)), sum)
+map_preserve_names_use_future <- function (list, fun)
+{
+  furrr::future_map(seq_along(list), function(i) {
+    obj = list[i][[1]]
+    return_obj <- fun(obj)
+    names(return_obj) = names(list)[i]
+    return(return_obj)
   })
 }

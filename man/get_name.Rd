@@ -2,10 +2,13 @@
 % Please edit documentation in R/transform.R
 \name{get_name}
 \alias{get_name}
-\title{sister function to encode_col, retrieve column names based on id(s)}
+\title{get names of encoded obj, sister func to encode_col, retrieve column names based on ids}
 \usage{
 get_name(df, ...)
 }
+\arguments{
+\item{...}{}
+}
 \description{
-sister function to encode_col, retrieve column names based on id(s)
+get names of encoded obj, sister func to encode_col, retrieve column names based on ids
 }

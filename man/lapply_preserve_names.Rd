@@ -2,11 +2,13 @@
 % Please edit documentation in R/programming.R
 \name{lapply_preserve_names}
 \alias{lapply_preserve_names}
-\title{lapply wrapper, but preserve object names}
+\title{lapply wrapper but preserve object names as the name suggests}
 \usage{
 lapply_preserve_names(list, fun)
 }
+\arguments{
+\item{fun}{}
+}
 \description{
-base lapply function give access to only the element of the vector but not other attributes
-such as name
+lapply wrapper but preserve object names as the name suggests
 }

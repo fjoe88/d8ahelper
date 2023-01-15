@@ -6,9 +6,6 @@
 \usage{
 format_num(num, digits = 2, ...)
 }
-\arguments{
-\item{...}{}
-}
 \description{
 Accept numerical vectors, or data.frame
 }

@@ -2,10 +2,13 @@
 % Please edit documentation in R/transform.R
 \name{get_id}
 \alias{get_id}
-\title{sister function to encode_col, retrieve column id based on name(s)}
+\title{get id from encoded obj, sister func to encode_col, retrieve column id based on names}
 \usage{
 get_id(df, ...)
 }
+\arguments{
+\item{...}{}
+}
 \description{
-sister function to encode_col, retrieve column id based on name(s)
+get id from encoded obj, sister func to encode_col, retrieve column id based on names
 }

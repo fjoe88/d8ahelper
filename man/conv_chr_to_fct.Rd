@@ -6,9 +6,6 @@
 \usage{
 conv_chr_to_fct(df)
 }
-\arguments{
-\item{df}{}
-}
 \description{
 convert all columns of character type to factor type
 }
