@@ -4,7 +4,14 @@
 \alias{fill_na_as_missing}
 \title{Fill NAs and empty cells with fillers such as a character}
 \usage{
-fill_na_as_missing(df, fill = "[missing]")
+fill_na_as_missing(
+  df,
+  pat = "^(\\\\s*\\\\[missing\\\\]\\\\s*|\\\\s*|NA|)$",
+  fill = "-"
+)
+}
+\arguments{
+\item{fill}{}
 }
 \description{
 Fill NAs and empty cells with fillers such as a character

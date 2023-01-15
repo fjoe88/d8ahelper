@@ -8,7 +8,7 @@
 #' @param ...
 #' @param format default to "f" which gives numbers in the usual xxx.xxx format. see help(formatC)
 #'
-#' @examples
+#' @example
 #' format_to_percentage(0.32)
 
 format_to_percentage <- function(x,
@@ -27,7 +27,7 @@ format_to_percentage <- function(x,
 #' @param digits
 #' @param ...
 #'
-#' @examples
+#' @example
 #' format_num(3.1415926)
 format_num <-
   function(num, digits = 2, ...) {
@@ -105,9 +105,8 @@ conv_fct_to_chr <- function(df) {
 #'
 #' @param df
 #'
-#' @examples
+#' @example
 #' conv_chr_to_fct(data.frame(a=c("a","a","b"),b=c(1,2,3)))
-
 conv_chr_to_fct <- function(df) {
   as.data.frame(sapply(df, function(col) {
     if (is.character(col)) {
@@ -125,7 +124,7 @@ conv_chr_to_fct <- function(df) {
 #'
 #' @param secs
 #'
-#' @examples
+#' @example
 #' secs_to_date(1622342600)
 secs_to_date <- function(secs) {
   as.POSIXct(secs, origin = "1970-01-01")
@@ -138,7 +137,7 @@ secs_to_date <- function(secs) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
 #' days_to_date(30)
 days_to_date <- function(days){
   secs <- days*(24*60*60)

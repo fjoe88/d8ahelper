@@ -52,7 +52,7 @@ trim_ws_df <- function(df) {
 #' Accept multiple columns if passed in a character vector containing column names
 #' @param df a data frame
 #' @param str column name(s)
-#' @examples
+#' @example
 #' move_left(mtcars, "wt")
 #' move_left(mtcars, c("gear", "carb", "wt"))
 
@@ -390,7 +390,7 @@ remove_duplicates <- function(df, ...) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
 remove_dup_cols <- function(df_list) {
 
   all_col_names <- Reduce(c, sapply(df_list, names))
@@ -440,7 +440,7 @@ remove_dup_cols <- function(df_list) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
 fill_na_as_missing <- function (df,
                                 pat = "^(\\s*\\[missing\\]\\s*|\\s*|NA|)$",
                                 fill = "-")
@@ -479,7 +479,7 @@ fill_as_na <- function(df, pattern = "[missing]") {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
 fill_missing_as_na <- function(df,
                                fill = NA,
                                pat = "^(\\s*\\[missing\\]\\s*|\\s*|NA|)$") {
@@ -671,14 +671,14 @@ clean_by_id <-
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
 #' fill_cols(data.frame(a=c(1, NA, 1, NA), b=c(1,1, 1, NA), b=c(1, 1, NA, NA)), th = 2)
 
 fill_cols <- function(df, th = 1, direction = "down") {
   vals <- names(df)[sapply(df, function(x)
     sum(!is.na(x)) <= th)]
-  df <- as_tibble(df)
-  df <- fill(df, one_of(vals), .direction = "down")
+  df <- dplyr::as_tibble(df)
+  df <- tidyr::fill(df, one_of(vals), .direction = "down")
   return(df)
 }
 

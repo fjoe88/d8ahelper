@@ -6,6 +6,9 @@
 \usage{
 secs_to_date(secs)
 }
+\arguments{
+\item{secs}{}
+}
 \description{
 Convert numerically converted format POSIXct time back to POSIXct datetime format
 }

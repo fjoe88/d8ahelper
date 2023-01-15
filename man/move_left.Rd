@@ -14,7 +14,3 @@ move_left(df, str)
 \description{
 Accept multiple columns if passed in a character vector containing column names
 }
-\examples{
-move_left(mtcars, "wt")
-move_left(mtcars, c("gear", "carb", "wt"))
-}

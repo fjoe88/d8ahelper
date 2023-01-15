@@ -6,7 +6,7 @@
 #' @param n number of top/bottom rows to include, or number of characters in case of a string
 #' @return top, bottom and a transition rows suggest how many rows skipped
 #' @simplify a bool, if FALSE will return named vectors with name being original string
-#' @examples
+#' @example
 #' headtail(mtcars)
 #' headtail("I would like to make this a very long string in order to make my case")
 

@@ -15,7 +15,3 @@ top, bottom and a transition rows suggest how many rows skipped
 \description{
 A quick glance into a dataframe combining n head and tail rows
 }
-\examples{
-headtail(mtcars)
-headtail("I would like to make this a very long string in order to make my case")
-}
