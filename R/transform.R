@@ -86,9 +86,10 @@ move_left <- function(df, str) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
+#' add_wmy(data.frame(date=Sys.Date()), dt_col = "date")
 add_wmy <- function(df, dt_col) {
-  if (lubridate::is.POSIXct(df[[dt_col]])) {
+  if (lubridate::is.Date(df[[dt_col]])) {
     df$dWeek <- as.factor(weekdays(df[[dt_col]]))
 
     df$WW <- lubridate::isoweek(df[[dt_col]] - 327600)
@@ -115,15 +116,18 @@ add_wmy <- function(df, dt_col) {
 #' @return
 #' @export
 #'
-#' @examples
+#' @example
 subset_by_quantile <- function(df,
                                col,
                                top = 0,
                                bottom = 0,
                                ...) {
-  df %>%
-    filter(df[[col]] >= quantile(df[[col]], bottom, na.rm = TRUE),
+  df <-
+    dplyr::filter(df,
+           df[[col]] >= quantile(df[[col]], bottom, na.rm = TRUE),
            df[[col]] <= quantile(df[[col]], 1 - top, na.rm = TRUE))
+  return(df)
+
 }
 
 
@@ -136,7 +140,6 @@ subset_by_quantile <- function(df,
 #' add_empty_rows(data_frame(a=c(1,2,3), b=c("a","b","c")), n = 5)
 
 add_empty_rows <- function(df, n) {
-  browser()
   new.row <- rep(NA, length = ncol(df))
   new.row <- rbind(new.row)
   m <- length(df[[1]])
