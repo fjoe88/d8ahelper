@@ -117,6 +117,7 @@ add_wmy <- function(df, dt_col) {
 #' @export
 #'
 #' @example
+#' subset_by_quantile(data.frame(a=1:100),col="a", top = 0.2, bottom =0.5)
 subset_by_quantile <- function(df,
                                col,
                                top = 0,
@@ -756,8 +757,7 @@ fill_cols <- function(df, th = 1, direction = "down") {
   return(df)
 }
 
-# column names --------------------------------------------------------------------------------
-
+# encode and decode column names --------------------------------------------------------------
 #' Replace column names with alpha-numeric sequences, returns a named vector (of name-value pairs) for column name look-up; Returns a list.
 #'
 #' @param df

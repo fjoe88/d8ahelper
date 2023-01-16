@@ -2,8 +2,7 @@
 % Please edit documentation in R/modelling.R
 \name{hclust_wss}
 \alias{hclust_wss}
-\title{Hierchical clustering
-Hiearchical clustering with for within cluster SSs screeplot for easier cluster number selection
+\title{Hiearchical clustering with for within cluster SSs screeplot for easier cluster number selection
 wrapper function of 'fastcluster' package method hclust (for matrix) and hclust.vector(for vector)}
 \usage{
 hclust_wss(x, method = "ward", max_clust = 10, members = NULL, visual = TRUE)
@@ -14,7 +13,6 @@ hclust_wss(x, method = "ward", max_clust = 10, members = NULL, visual = TRUE)
 \item{method}{the agglomeration method to be used. This must be (an unambiguous abbreviation of) one of "single", "complete", "average", "mcquitty", "ward.D", "ward.D2", "centroid" or "median" (for matrices) or "single", "ward", "centroid" or "median" (for a vector)}
 }
 \description{
-Hierchical clustering
 Hiearchical clustering with for within cluster SSs screeplot for easier cluster number selection
 wrapper function of 'fastcluster' package method hclust (for matrix) and hclust.vector(for vector)
 }

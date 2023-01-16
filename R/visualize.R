@@ -1,8 +1,5 @@
 
 
-# Visualize -------------------------------------------------------------
-
-
 #' list of ggplot objects into one plot
 #'
 #' @param ...

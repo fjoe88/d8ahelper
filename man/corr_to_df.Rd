@@ -2,7 +2,7 @@
 % Please edit documentation in R/modelling.R
 \name{corr_to_df}
 \alias{corr_to_df}
-\title{ilter high corr features and output in tidy format}
+\title{Filter high corr features and output in tidy format}
 \usage{
 corr_to_df(cor, level = 0.9)
 }
@@ -12,5 +12,5 @@ corr_to_df(cor, level = 0.9)
 \item{level}{}
 }
 \description{
-ilter high corr features and output in tidy format
+Filter high corr features and output in tidy format
 }

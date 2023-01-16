@@ -1,5 +1,4 @@
 
-# Formatting ----------------------------------------------------------------------------------
 
 #' Convert integer/floating point number format to percentage format
 #'

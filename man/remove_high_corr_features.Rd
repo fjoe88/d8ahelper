@@ -2,7 +2,7 @@
 % Please edit documentation in R/modelling.R
 \name{remove_high_corr_features}
 \alias{remove_high_corr_features}
-\title{wraper function ofcaret::findCorrelation: find and remove highly correlated features}
+\title{Wrapper function of caret::findCorrelation: find and remove highly correlated features}
 \usage{
 remove_high_corr_features(df, level = 0.99, simplify = FALSE)
 }
@@ -17,7 +17,7 @@ requires data frame of numeric w/o missing values}
 returns a list of 1) reduced df 2) corr table of removed features
 }
 \description{
-wraper function ofcaret::findCorrelation: find and remove highly correlated features
+Wrapper function of caret::findCorrelation: find and remove highly correlated features
 }
 \details{
 if level == 1, find all perfectly correlated variables, remove half and return a list containing removed feature name pairs, unless simplify == TRUE

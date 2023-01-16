@@ -4,7 +4,7 @@
 # pre-processing ------------------------------------------------------------------------------
 
 
-#' ilter high corr features and output in tidy format
+#' Filter high corr features and output in tidy format
 #'
 #' @param cor corr matrix of numerical format
 #' @param level
@@ -43,7 +43,7 @@ corr_to_df <- function(cor,
 }
 
 
-#' wraper function ofcaret::findCorrelation: find and remove highly correlated features
+#' Wrapper function of caret::findCorrelation: find and remove highly correlated features
 #'
 #' @param df a data frame of numerical values w/o NAs
 #' @param level a numeric for threshold as cutoff point for defining 'high correlation'
@@ -134,10 +134,7 @@ model_lm <- function(formula, dataset) {
 
 
 
-# unsupervised learnings --------------------------------------------------
-
-#'Hierchical clustering
-
+# Unsupervised Learning --------------------------------------------------
 
 #' Hiearchical clustering with for within cluster SSs screeplot for easier cluster number selection
 #' wrapper function of 'fastcluster' package method hclust (for matrix) and hclust.vector(for vector)
