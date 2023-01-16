@@ -1,20 +1,29 @@
 
 
-# Visualize -----------------------------------------------------------------------------------
+# Visualize -------------------------------------------------------------
 
+
+#' list of ggplot objects into one plot
+#'
+#' @param ...
+#' @param plotlist
+#' @param file
+#' @param cols Number of columns in layout
+#' @param layout A matrix specifying the layout. If present, 'cols' is ignored.
+#' @details
+#' If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+#' then plot 1 will go in the upper left, 2 will go in the upper right, and
+#' 3 will go all the way across the bottom
+#' @return
+#' @export
+#'
+#' @examples
 multiplot <-
   function(...,
            plotlist = NULL,
            file,
            cols = 1,
            layout = NULL) {
-    # ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
-    # - cols:   Number of columns in layout
-    # - layout: A matrix specifying the layout. If present, 'cols' is ignored.
-    #
-    # If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
-    # then plot 1 will go in the upper left, 2 will go in the upper right, and
-    # 3 will go all the way across the bottom
 
     require(grid)
 
@@ -56,6 +65,21 @@ multiplot <-
   }
 
 
+#' Boxplot with confidence intervals and summary statistics such as p-val and risk
+#'
+#' @param num
+#' @param grp
+#' @param data
+#' @param anova
+#' @param alpha
+#' @param verbose
+#' @param plot_only
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 plot_boxplot <-
   function(num,
            grp = NULL,
@@ -65,7 +89,6 @@ plot_boxplot <-
            verbose = TRUE,
            plot_only = TRUE,
            ...) {
-    #' boxplot with confidence intervals and summary statistics such as p-val and risk
 
     if (!is.null(grp)) {
       formula = num ~ grp

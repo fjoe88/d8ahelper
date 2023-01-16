@@ -1,20 +1,21 @@
 
 #'Copy unique values to clipboard.
 #'
-#'1) if input is a dataframe, do not return back a df \cr
-#'2) by default will assume lotids being copied and format them unless set format_lotid = FALSE \cr
-#'3) if format_step == TRUE, return a comma separated step name string instead \cr
-#'4) if save_csv == TRUE, will save output to '1.lot_list.csv' \cr
+#'1) if input is a data.frame, do not return back a df
+#'2) by default will assume lotids being copied and format them unless set format_lotid = FALSE
+#'3) if format_step == TRUE, return a comma separated step name string instead
+#'4) if save_csv == TRUE, will save output to '1.lot_list.csv'
 #'
 #'@param df a character string copied from clipboard, or a dataframe column
 #'@param col column name if df is a data frame
 #'@return a comma separated string w/ duplicates removed and a dataframe of unique values
+#'@export
 #'
 #'@example
 #'copy_unique(df = "apple banana apple orange", format_lotid = FALSE)
 
 copy_unique <-
-  function (df = paste(readClipboard(), collapse = ","),
+  function (df = paste(utils::readClipboard(), collapse = ","),
             col = "value",
             sep = ",",
             reduce_only = FALSE,
@@ -82,13 +83,12 @@ copy_unique <-
 
 #' A custom way to output CSV files
 #'
-#' Will copy file path to clipboard for convinient file locate or remove (via unlink())
-#'
 #' @param df a data frame
 #' @param time_as_chr specify if to convert datetime columns to character before export
 #' @param path ouput folder, by default use 'r_output' folder under root directory
 #' @param file.name character name for output file name
 #' @param folder specify output folder under 'path'
+#' @export
 
 save_csv <- function(df,
                      file.name = "r_output.csv",
@@ -143,8 +143,19 @@ save_csv <- function(df,
 
 }
 
-#' A wrapper function of save_csv that applies to a list of data frames
 
+#' A wrapper function of save_csv that applies to a list of data frames
+#'
+#' @param lst
+#' @param overwrite
+#' @param use_name
+#' @param use_clean_names
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 save_csv_from_a_list <- function(lst,
                                  overwrite = FALSE,
                                  use_name = FALSE,
@@ -190,6 +201,7 @@ save_csv_from_a_list <- function(lst,
 #' @param path target folder, by default use 'r_output' folder under root directory
 #' @param folder specify output folder under 'path'
 #' @param load a boolean value, if == "FALSE" then only print to console the existing files
+#' @export
 
 load_csv <- function(file = 'r_output.csv',
                      path = here::here("r_output"),
@@ -222,8 +234,15 @@ load_csv <- function(file = 'r_output.csv',
   }
 }
 
-#' Wrapper function for convenient copy from Excel into a data frame ('Trick' via @SuzanBaert on twitter)
 
+#' Wrapper function for convenient copy from Excel into a data frame ('Trick' via SuzanBaert on twitter)
+#'
+#' @param header
+#'
+#' @return
+#' @export
+#'
+#' @examples
 from_excel <- function(header = TRUE) {
   read.table(file = "clipboard", sep = "\t", header = header)
 }
@@ -256,10 +275,17 @@ write_fwf = function(dt, file, width,
   writeLines(out, file)
 }
 
-#' wrapper function to data.table::fread to convert blank cells to NA at reading
-#' for some reason data.table::fread do not convert blank cell to NA even with na.string = ""
-#' see https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread
 
+#' wrapper function to data.table::fread to convert blank cells to NA at reading
+#' https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread
+#'
+#' @param file
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 fread2 <- function(file, ...) {
   dt <- data.table::fread(file = file, ...)
   dt[dt == ""] <- NA
@@ -270,7 +296,7 @@ fread2 <- function(file, ...) {
 #' @param load_from a path for where files are load from
 #' @param load a logical for if actually read the files; if pattern is not ".csv", then read as text
 #' @param read_as_df a logical, if to read as data frame, else read as text
-#'
+#' @export
 #'
 load_files <- function(load_from,
                        pattern = "\\.csv$",
@@ -320,10 +346,20 @@ load_files <- function(load_from,
 }
 
 
-#' R's base::file.copy can only copy a directory as a entirety to another directory
-#' to enable copy files to another directory
-#' allow re matching to copy only a subset of all files
+
+#' copy files to another directory
 #'
+#' @param from
+#' @param to
+#' @param pattern
+#' @param overwrite
+#' @param copy.mode
+#' @param copy.date
+#'
+#' @return
+#' @export
+#'
+#' @examples
 file.copy.content.only <- function(from,
                                    to,
                                    pattern = ".*",
@@ -340,7 +376,18 @@ file.copy.content.only <- function(from,
 }
 
 
+
 #' Perform a non intrusive inspection of a given directory and return a dataframe with essential file information sorted by file size
+#'
+#' @param dir
+#' @param recursive
+#' @param pattern
+#' @param silence
+#'
+#' @return
+#' @export
+#'
+#' @examples
 insp_dir <- function(dir,
                      recursive = TRUE,
                      pattern = ".*",
@@ -399,6 +446,7 @@ insp_dir <- function(dir,
 #' given a directory, delete files given the regex pattern excluding files matching to 'avoid' arg
 #' @param pattern a regex string, used to match files to be deleted
 #' @param avoid a regular expression string, matched files will not be deleted
+#' @export
 
 clear_dir <- function(dir,
                       pattern = ".csv",
@@ -428,8 +476,17 @@ clear_dir <- function(dir,
 
 # Encryption ----------------------------------------------------------------------------------
 
-#' A wrapper function for sodium::keygen to generate, convert keys
 
+
+#' A wrapper function for sodium::keygen to generate, convert keys
+#'
+#' @param key_file
+#' @param convert_to_sodium_key
+#'
+#' @return
+#' @export
+#'
+#' @examples
 gen_key <- function(key_file,
                     convert_to_sodium_key = FALSE) {
 
@@ -443,8 +500,17 @@ gen_key <- function(key_file,
   return(key)
 }
 
-#' A wrapper function to encrypt file using a key
 
+#' A wrapper function to encrypt file using a key
+#'
+#' @param file_orig
+#' @param file_enc
+#' @param key_file
+#'
+#' @return
+#' @export
+#'
+#' @examples
 encrypt <- function(file_orig,
                     file_enc,
                     key_file) {
@@ -470,8 +536,17 @@ encrypt <- function(file_orig,
   }
 }
 
+
 #' A wrapper function to decrypt file using a key
 #'
+#' @param file_enc
+#' @param file_orig
+#' @param key_file
+#'
+#' @return
+#' @export
+#'
+#' @examples
 decrypt <- function(file_enc,
                     file_orig,
                     key_file) {
@@ -501,7 +576,7 @@ decrypt <- function(file_enc,
 
 #' A wrapper function for the workflow of decrypt, source and encrypt back files
 #' @param encrypt a bool, if TRUE then encrypt the file with key_file
-
+#' @export
 
 open_encrypted <- function(file_actual,
                            file_encrypted,

@@ -2,9 +2,7 @@
 % Please edit documentation in R/transfer.R
 \name{file.copy.content.only}
 \alias{file.copy.content.only}
-\title{R's base::file.copy can only copy a directory as a entirety to another directory
-to enable copy files to another directory
-allow re matching to copy only a subset of all files}
+\title{copy files to another directory}
 \usage{
 file.copy.content.only(
   from,
@@ -15,8 +13,9 @@ file.copy.content.only(
   copy.date = FALSE
 )
 }
+\arguments{
+\item{copy.date}{}
+}
 \description{
-R's base::file.copy can only copy a directory as a entirety to another directory
-to enable copy files to another directory
-allow re matching to copy only a subset of all files
+copy files to another directory
 }

@@ -4,6 +4,7 @@
 #' @param n number of top/bottom rows to include, or number of characters in case of a string
 #' @return top, bottom and a transition rows suggest how many rows skipped
 #' @simplify a bool, if FALSE will return named vectors with name being original string
+#' @export
 #' @example
 #' headtail(mtcars)
 #' headtail("I would like to make this a very long string in order to make my case")
@@ -41,6 +42,7 @@ headtail <- function(df, n = 5, simplify = TRUE) {
 }
 
 #' Get the mode of a vector
+#' @export
 #'
 #' @example
 #' x <- c("a","d","a","b","a","c",NA,NA,NA,NA,NA)
@@ -59,6 +61,11 @@ get_mode <- function(x, na.rm = TRUE) {
 
 
 #' Function factory to create nth quantile function
+#'
+#' @param num
+#' @export
+#' @example
+#' q50 <- ff_quantile(0.50)
 
 ff_quantile <- function(num){
   function(x, ...) {
@@ -66,16 +73,12 @@ ff_quantile <- function(num){
   }
 }
 
-q5  <- ff_quantile(0.05)
-q10 <- ff_quantile(0.10)
-q25 <- ff_quantile(0.25)
-q50 <- ff_quantile(0.50)
-q75 <- ff_quantile(0.75)
-q90 <- ff_quantile(0.90)
-q95 <- ff_quantile(0.95)
-
-
 #' Extract unique rows combinations and show row counts
+#'
+#' @param df
+#' @param ...
+#' @export
+#' @example
 
 unique_row <- function(df, ...) {
   if (missing(...)) {
@@ -118,6 +121,7 @@ unique_row <- function(df, ...) {
 #' @param x a column #, unique values displayed as row headers
 #' @param y a column #, unique values displayed as column headers
 #' @return a data frame
+#' @export
 #' @example
 #' sum_table(ToothGrowth, x = "supp", y = "dose")
 
@@ -144,6 +148,7 @@ sum_table <- function(df, x, y, sum = TRUE, ...) {
 #' @param outlier_method "z" (Normal) or "mad" (Nonparametric) for how to categorize outliers
 #' @param thres a number to suggest number of standard deviations to use for categorize outliers
 #' @return a data frame
+#' @export
 #' @example
 #' View(sum_col(iris))
 
@@ -241,6 +246,7 @@ sum_col <- function(df,
 
 #'Generate row-wise summary for missing and unique values
 #'
+#' @export
 
 sum_row <- function(df) {
 
@@ -259,7 +265,7 @@ sum_row <- function(df) {
 }
 
 #'Sister function to sum_col and sum_row, returns a list of results from each
-#'
+#'@export
 
 sum_df <- function(df){
 
@@ -271,6 +277,7 @@ sum_df <- function(df){
 #'
 #' @param df a data frame
 #' @param num top n number of missing rows to return
+#' @export
 #' @example
 #' foo <- d8ahelper::insert_nas(mtcars) #generate missing values for each row
 #' View(sum_missing(foo))
@@ -298,10 +305,9 @@ sum_missing <- function(df, num = 5, ...) {
 #' examine if a data holder contains 'value' in a pre-defined term
 #'
 #' @param x a vector or a list
+#' @export
 #' @example
-#' foo <- c(NA, NULL, "", "  ", "first value")
-#' contain_value(foo)
-#' which(contain_value(foo))
+#' contain_value(c(NA, NULL, "", "  ", "first value"))
 contain_value <- function(x) {
 
   .doesnt_contain_value <- function(x){
@@ -323,6 +329,7 @@ contain_value <- function(x) {
 #' Output summary of duplicated rows by given keys
 #' @param keys a character vector contains column names to be used for grouping
 #' @return a list, of which 'dups' is a subset dataframe contain only duplicated entries by group, 'dup_count' is a count summary by group, 'dup_row' is row index of duplicated rows by group, and 'dup_row_bool' is boolean of duplicated rows by group
+#' @export
 any_dups <- function(df, keys) {
 
   df1 <- data.table::as.data.table(df)[, N := .N, by = keys]
@@ -353,8 +360,15 @@ any_dups <- function(df, keys) {
   )
 }
 
-#count number of lines without using read_csv
-#read n lines at a time
+#' Count number of lines without using read_csv
+#'
+#' @param filepath
+#' @param batch
+#'
+#' @return
+#' @export
+#'
+#' @examples
 count_lines = function(filepath, batch = 1000) {
   con = file(filepath, "r")
   n = 0
@@ -370,8 +384,16 @@ count_lines = function(filepath, batch = 1000) {
   return(n)
 }
 
+#' Convert dataframe to text output
+#'
+#' @param df
+#'
+#' @return
+#' @export
+#'
+#' @examples
 df_to_txt <- function(df) {
-  #convert dataframe to text output
+
   foo <- lapply(seq_len(nrow(df)), function(i) {
     return(paste(df[i,], collapse = "\t"))
   })

@@ -6,6 +6,9 @@
 \usage{
 encrypt(file_orig, file_enc, key_file)
 }
+\arguments{
+\item{key_file}{}
+}
 \description{
 A wrapper function to encrypt file using a key
 }

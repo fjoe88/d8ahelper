@@ -3,13 +3,14 @@
 \name{fread2}
 \alias{fread2}
 \title{wrapper function to data.table::fread to convert blank cells to NA at reading
-for some reason data.table::fread do not convert blank cell to NA even with na.string = ""
-see https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread}
+https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread}
 \usage{
 fread2(file, ...)
 }
+\arguments{
+\item{...}{}
+}
 \description{
 wrapper function to data.table::fread to convert blank cells to NA at reading
-for some reason data.table::fread do not convert blank cell to NA even with na.string = ""
-see https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread
+https://stackoverflow.com/questions/51019041/blank-space-not-recognised-as-na-in-fread
 }

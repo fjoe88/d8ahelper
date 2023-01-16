@@ -2,10 +2,13 @@
 % Please edit documentation in R/modelling.R
 \name{model_lm}
 \alias{model_lm}
-\title{run lm model and print a curated summary output}
+\title{Run lm model and print a curated summary output}
 \usage{
 model_lm(formula, dataset)
 }
+\arguments{
+\item{dataset}{}
+}
 \description{
-run lm model and print a curated summary output
+Run lm model and print a curated summary output
 }

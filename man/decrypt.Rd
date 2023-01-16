@@ -6,6 +6,9 @@
 \usage{
 decrypt(file_enc, file_orig, key_file)
 }
+\arguments{
+\item{key_file}{}
+}
 \description{
 A wrapper function to decrypt file using a key
 }

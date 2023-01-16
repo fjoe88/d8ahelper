@@ -97,6 +97,9 @@ cap_str <- function(x, collapse = " ") {
 }
 
 #'convert all columns of factor type to character type
+#'
+#' @param df
+#' @export
 conv_fct_to_chr <- function(df) {
   as.data.frame(sapply(df, function(col) {
     if (is.factor(col)) {

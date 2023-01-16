@@ -5,7 +5,7 @@
 \title{Copy unique values to clipboard.}
 \usage{
 copy_unique(
-  df = paste(readClipboard(), collapse = ","),
+  df = paste(utils::readClipboard(), collapse = ","),
   col = "value",
   sep = ",",
   reduce_only = FALSE,
@@ -25,9 +25,9 @@ a comma separated string w/ duplicates removed and a dataframe of unique values
 }
 \description{
 \enumerate{
-\item if input is a dataframe, do not return back a df \cr
-\item by default will assume lotids being copied and format them unless set format_lotid = FALSE \cr
-\item if format_step == TRUE, return a comma separated step name string instead \cr
-\item if save_csv == TRUE, will save output to '1.lot_list.csv' \cr
+\item if input is a data.frame, do not return back a df
+\item by default will assume lotids being copied and format them unless set format_lotid = FALSE
+\item if format_step == TRUE, return a comma separated step name string instead
+\item if save_csv == TRUE, will save output to '1.lot_list.csv'
 }
 }

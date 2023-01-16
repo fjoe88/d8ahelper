@@ -2,16 +2,15 @@
 % Please edit documentation in R/modelling.R
 \name{corr_to_df}
 \alias{corr_to_df}
-\title{filter high corr features and output in tidy format
-input: corr matrix of numerical format
-output: a data frame
-if level == 1, find perfectly correlated features aside from themselves}
+\title{ilter high corr features and output in tidy format}
 \usage{
 corr_to_df(cor, level = 0.9)
 }
+\arguments{
+\item{cor}{corr matrix of numerical format}
+
+\item{level}{}
+}
 \description{
-filter high corr features and output in tidy format
-input: corr matrix of numerical format
-output: a data frame
-if level == 1, find perfectly correlated features aside from themselves
+ilter high corr features and output in tidy format
 }

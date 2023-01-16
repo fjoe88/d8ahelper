@@ -10,8 +10,11 @@ remove_high_corr_features(df, level = 0.99, simplify = FALSE)
 \item{df}{a data frame of numerical values w/o NAs}
 
 \item{level}{a numeric for threshold as cutoff point for defining 'high correlation'
-returns a list of 1) reduced df 2) corr table of removed features
+
 requires data frame of numeric w/o missing values}
+}
+\value{
+returns a list of 1) reduced df 2) corr table of removed features
 }
 \description{
 wraper function ofcaret::findCorrelation: find and remove highly correlated features

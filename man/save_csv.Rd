@@ -27,5 +27,5 @@ save_csv(
 \item{time_as_chr}{specify if to convert datetime columns to character before export}
 }
 \description{
-Will copy file path to clipboard for convinient file locate or remove (via unlink())
+A custom way to output CSV files
 }

@@ -12,6 +12,9 @@ save_csv_from_a_list(
   ...
 )
 }
+\arguments{
+\item{...}{}
+}
 \description{
 A wrapper function of save_csv that applies to a list of data frames
 }

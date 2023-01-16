@@ -6,6 +6,9 @@
 \usage{
 gen_key(key_file, convert_to_sodium_key = FALSE)
 }
+\arguments{
+\item{convert_to_sodium_key}{}
+}
 \description{
 A wrapper function for sodium::keygen to generate, convert keys
 }

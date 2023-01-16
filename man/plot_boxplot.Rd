@@ -2,7 +2,7 @@
 % Please edit documentation in R/visualize.R
 \name{plot_boxplot}
 \alias{plot_boxplot}
-\title{boxplot with confidence intervals and summary statistics such as p-val and risk}
+\title{Boxplot with confidence intervals and summary statistics such as p-val and risk}
 \usage{
 plot_boxplot(
   num,
@@ -15,6 +15,9 @@ plot_boxplot(
   ...
 )
 }
+\arguments{
+\item{...}{}
+}
 \description{
-boxplot with confidence intervals and summary statistics such as p-val and risk
+Boxplot with confidence intervals and summary statistics such as p-val and risk
 }

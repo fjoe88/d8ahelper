@@ -4,14 +4,18 @@
 # pre-processing ------------------------------------------------------------------------------
 
 
+#' ilter high corr features and output in tidy format
+#'
+#' @param cor corr matrix of numerical format
+#' @param level
+#'
+#' @return
+#' @export
+#'
+#' @examples
 corr_to_df <- function(cor,
                        level = 0.9 #TODO: figure out proper th
                        ) {
-  #' filter high corr features and output in tidy format
-  #' input: corr matrix of numerical format
-  #' output: a data frame
-  #' if level == 1, find perfectly correlated features aside from themselves
-
   cor <- abs(cor)
   cor[upper.tri(cor)] <- NA
   cor <- as.data.frame(cor)
@@ -39,18 +43,23 @@ corr_to_df <- function(cor,
 }
 
 
+#' wraper function ofcaret::findCorrelation: find and remove highly correlated features
+#'
+#' @param df a data frame of numerical values w/o NAs
+#' @param level a numeric for threshold as cutoff point for defining 'high correlation'
+#'
+#' requires data frame of numeric w/o missing values
+#' @param simplify
+#' @details if level == 1, find all perfectly correlated variables, remove half and return a list containing removed feature name pairs, unless simplify == TRUE
+#'
+#' @return returns a list of 1) reduced df 2) corr table of removed features
+#' @export
+#'
+#' @examples
 remove_high_corr_features <-
   function(df,
-           level = 0.99, #TODO: figure out proper th
+           level = 0.99,
            simplify = FALSE) {
-    #' wraper function ofcaret::findCorrelation: find and remove highly correlated features
-    #'
-    #' @param df a data frame of numerical values w/o NAs
-    #' @param level a numeric for threshold as cutoff point for defining 'high correlation'
-    #' returns a list of 1) reduced df 2) corr table of removed features
-    #' requires data frame of numeric w/o missing values
-    #' @details if level == 1, find all perfectly correlated variables, remove half and return a list containing removed feature name pairs, unless simplify == TRUE
-    #'
     descrCor <- cor(df)
     descrCor.df <- as.data.frame(descrCor)
 
@@ -91,8 +100,16 @@ remove_high_corr_features <-
 
 # Modeling ------------------------------------------------------------------------------------
 
+#' Run lm model and print a curated summary output
+#'
+#' @param formula
+#' @param dataset
+#'
+#' @return
+#' @export
+#'
+#' @examples
 model_lm <- function(formula, dataset) {
-  #' run lm model and print a curated summary output
   model1 <- lm(formula = formula, data = dataset)
   stats <- round(
     c(
@@ -127,6 +144,7 @@ model_lm <- function(formula, dataset) {
 #'
 #' @param x an (N×D) matrix of 'double' values: N observations in D variables.
 #' @param method the agglomeration method to be used. This must be (an unambiguous abbreviation of) one of "single", "complete", "average", "mcquitty", "ward.D", "ward.D2", "centroid" or "median" (for matrices) or "single", "ward", "centroid" or "median" (for a vector)
+#' @export
 
 hclust_wss <- function(x,
                        method = "ward",
@@ -169,6 +187,12 @@ hclust_wss <- function(x,
 
 #' a wrapper function to 'gstat::gstat' function to use a univariate or multivariate geostatistical model with input of x,y coordinate and fill z column with predictions, for each id group.
 #' puff_my_df can be used to make all available entries available for each group
+#'
+#' @param df
+#' @param idcol
+#' @param xcol
+#' @param ycol
+#' @param zcol
 
 fill_map <- function(df, idcol, xcol='x', ycol='y', zcol='z'){
 

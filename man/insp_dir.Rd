@@ -6,6 +6,9 @@
 \usage{
 insp_dir(dir, recursive = TRUE, pattern = ".*", silence = TRUE)
 }
+\arguments{
+\item{silence}{}
+}
 \description{
 Perform a non intrusive inspection of a given directory and return a dataframe with essential file information sorted by file size
 }
