@@ -40,8 +40,10 @@ trim_ws <- function(x,
 
 #' Remove leading and trailing whitespaces that are within any character or factor type columns of a data.frame
 #'
-#' @export
 #' @param df a data.frame
+#' @export
+#' @example
+#' trim_ws_df(data.frame(a=c(1,2,3),b=c("  f","o   ", "  o")))
 
 trim_ws_df <- function(df) {
   if (!is.data.frame(df)) {
@@ -119,6 +121,7 @@ add_wmy <- function(df, dt_col) {
 #'
 #' @example
 #' subset_by_quantile(data.frame(a=1:100),col="a", top = 0.2, bottom =0.5)
+
 subset_by_quantile <- function(df,
                                col,
                                top = 0,
@@ -155,7 +158,7 @@ add_empty_rows <- function(df, n) {
 
 # join -----------------------------------------------------------------------------------
 
-#' Coalescence join x, y data frames, for columns of same names, append y values to x if rows that are missing value
+#' Coalescence join lhs x and rhs y data frames, for each column-row combination, append rhs to lhs if missing, use lhs value if there are conflicts
 #'
 #' @param x
 #' @param y
@@ -163,23 +166,24 @@ add_empty_rows <- function(df, n) {
 #' @param suffix
 #' @param join
 #' @param ...
+#'
 #' @export
-
+#' @examples
+#' df1 <- data.frame(id=c("a","a","b","c"), id2=c(1,2,1,1), data=c(1,NA,NA,2))
+#' df2 <- data.frame(id=c("a","a","b","c"), id2=c(1,2,1,1), data=c(NA,3,NA,1))
+#' coalesce_join(df1,df2,by=c('id','id2'))
 coalesce_join <- function(x,
                           y,
                           by = NULL,
                           suffix = c(".x", ".y"),
                           join = dplyr::left_join,
                           ...) {
-  x <-
-    select(x,-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
 
-  y <-
-    select(y,-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
+  x <- x[,!str_count(names(x), ".x|.y") >= 1]
+  y <- y[,!str_count(names(y), ".x|.y") >= 1]
 
   joined <- join(x, y, by = by, suffix = suffix, ...)
-  joined <-
-    select(joined,-c(names(.)[str_count(names(.), ".x|.y") >= 2]))
+  joined <- joined[,!str_count(names(joined), ".x|.y") >= 2]
 
   # names of desired output
   cols <- union(names(x), names(y))
