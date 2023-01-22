@@ -1,5 +1,6 @@
 
 
+
 #' list of ggplot objects into one plot
 #'
 #' @param ...
@@ -21,7 +22,6 @@ multiplot <-
            file,
            cols = 1,
            layout = NULL) {
-
     require(grid)
 
     # Make a list from the ... arguments and plotlist
@@ -50,7 +50,8 @@ multiplot <-
       # Make each plot, in the correct location
       for (i in 1:numPlots) {
         # Get the i,j matrix positions of the regions that contain this subplot
-        matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+        matchidx <-
+          as.data.frame(which(layout == i, arr.ind = TRUE))
 
         print(plots[[i]],
               vp = viewport(
@@ -86,7 +87,6 @@ plot_boxplot <-
            verbose = TRUE,
            plot_only = TRUE,
            ...) {
-
     if (!is.null(grp)) {
       formula = num ~ grp
       if (anova) {
@@ -141,7 +141,6 @@ plot_boxplot <-
     }
 
     for (k in grps) {
-
       Xloc = num[grp == k]
       y0 = c(y0, mean(Xloc) - qnorm(1 - alpha / 2) * sd(Xloc) / sqrt(length(Xloc)))
       y1 = c(y1, mean(Xloc) + qnorm(1 - alpha / 2) * sd(Xloc) / sqrt(length(Xloc)))
@@ -176,5 +175,7 @@ plot_boxplot <-
 
     if (plot_only == TRUE) {
       return(invisible(res))
-    } else { return(res) }
+    } else {
+      return(res)
+    }
   }

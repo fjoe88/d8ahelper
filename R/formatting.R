@@ -1,5 +1,6 @@
 
 
+
 #' Convert integer/floating point number format to percentage format
 #'
 #' @param x a number
@@ -15,7 +16,6 @@ format_to_percentage <- function(x,
                                  digits = 2,
                                  format = "f",
                                  ...) {
-
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
@@ -32,7 +32,6 @@ format_to_percentage <- function(x,
 #' format_num(3.1415926)
 format_num <-
   function(num, digits = 2, ...) {
-
     if (is.data.frame(num)) {
       is.num <- sapply(num, is.numeric)
       num[is.num] <- lapply(num[is.num], function(x) {
@@ -60,7 +59,7 @@ format_datetime <- function (df,
 {
   if (is.data.frame(df)) {
     for (col in names(df)[grep(regex, names(df))]) {
-      if(typeof(df[[col]])!="character"){
+      if (typeof(df[[col]]) != "character") {
         df[[col]] <- as.character(df[[col]])
       }
       df[[col]] <- readr::parse_datetime(df[[col]],
@@ -83,22 +82,24 @@ format_datetime <- function (df,
 #' cap_str("a WOrd CAPITALIZED,   with extra   spaces,with no leading space")
 
 cap_str <- function(x, collapse = " ") {
-
   x <- tolower(x)
   x <- strsplit(x, ",", perl = TRUE)[[1]]
   x <- paste(x, collapse = ", ")
   x <- strsplit(x, "[[:space:]]+", perl = TRUE)[[1]]
 
-  paste(toupper(substring(x, 1,1)),
+  paste(toupper(substring(x, 1, 1)),
         substring(x, 2),
-        sep="",
-        collapse=collapse)
+        sep = "",
+        collapse = collapse)
 }
 
 #'convert all columns of factor type to character type
 #'
 #' @param df
 #' @export
+#' @example
+#' conv_fct_to_chr(data.frame(a=as.factor(c("a","a","b")),b=c(1,2,3)))
+
 conv_fct_to_chr <- function(df) {
   as.data.frame(sapply(df, function(col) {
     if (is.factor(col)) {
@@ -150,7 +151,7 @@ secs_to_date <- function(secs) {
 #'
 #' @example
 #' days_to_date(30)
-days_to_date <- function(days){
-  secs <- days*(24*60*60)
+days_to_date <- function(days) {
+  secs <- days * (24 * 60 * 60)
   as.POSIXct(secs, origin = "1970-01-01")
 }

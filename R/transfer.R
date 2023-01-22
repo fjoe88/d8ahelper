@@ -1,4 +1,5 @@
 
+
 #'Copy unique values to clipboard.
 #'
 #'1) if input is a data.frame, do not return back a df
@@ -98,8 +99,8 @@ save_csv <- function(df,
                      use_readr = FALSE,
                      as_chr = TRUE,
                      ...) {
-
-  if (!is.data.frame(df)) return(NA)
+  if (!is.data.frame(df))
+    return(NA)
 
   dir.create(file.path(path),
              showWarnings = FALSE)
@@ -119,7 +120,9 @@ save_csv <- function(df,
                    folder,
                    file.name)
 
-  if (file.exists(file) && overwrite == FALSE) stop(glue::glue("{file} already exists!"))
+  if (file.exists(file) &&
+      overwrite == FALSE)
+    stop(glue::glue("{file} already exists!"))
 
   if (file.exists(file) && overwrite == TRUE) {
     unlink(file)
@@ -129,13 +132,13 @@ save_csv <- function(df,
     df <- df %>% dplyr::mutate_all(as.character)
   }
 
-  if (use_readr == FALSE){
+  if (use_readr == FALSE) {
     data.table::fwrite(df,
                        file = file,
                        ...)
   }
 
-  if (use_readr == TRUE){
+  if (use_readr == TRUE) {
     readr::write_csv(df,
                      path = file,
                      ...)
@@ -163,8 +166,8 @@ save_csv_from_a_list <- function(lst,
                                  ...)
 {
   lst[is.na(lst)] <- NULL
-  lst[!sapply(lst, function(x) is.data.frame(x)
-  )] <- NULL
+  lst[!sapply(lst, function(x)
+    is.data.frame(x))] <- NULL
 
   if (use_clean_names == TRUE) {
     names(lst) <- janitor::make_clean_names(names(lst), case = "snake")
@@ -214,7 +217,7 @@ load_csv <- function(file = 'r_output.csv',
   }
 
   if (load == TRUE) {
-    if(!grepl("\\.csv$", file)){
+    if (!grepl("\\.csv$", file)) {
       file <- paste0(file, ".csv")
     }
 
@@ -244,18 +247,23 @@ load_csv <- function(file = 'r_output.csv',
 #'
 #' @examples
 from_excel <- function(header = TRUE) {
-  read.table(file = "clipboard", sep = "\t", header = header)
+  read.table(file = "clipboard",
+             sep = "\t",
+             header = header)
 }
 
 #'  via @haozhu233 (on GitHub)
 #'  write fixed width format text file
 
-write_fwf = function(dt, file, width,
-                     justify = "l", replace_na = "NA") {
+write_fwf = function(dt,
+                     file,
+                     width,
+                     justify = "l",
+                     replace_na = "NA") {
   fct_col = which(sapply(dt, is.factor))
   if (length(fct_col) > 0) {
     for (i in fct_col) {
-      dt[,i] <- as.character(dt[,i])
+      dt[, i] <- as.character(dt[, i])
     }
   }
   dt[is.na(dt)] = replace_na
@@ -263,12 +271,12 @@ write_fwf = function(dt, file, width,
   justify = unlist(strsplit(justify, ""))
   justify = as.character(factor(justify, c("l", "r"), c("-", "")))
   if (n_col != 1) {
-    if (length(width) == 1) width = rep(width, n_col)
-    if (length(justify) == 1) justify = rep(justify, n_col)
+    if (length(width) == 1)
+      width = rep(width, n_col)
+    if (length(justify) == 1)
+      justify = rep(justify, n_col)
   }
-  sptf_fmt = paste0(
-    paste0("%", justify, width, "s"), collapse = ""
-  )
+  sptf_fmt = paste0(paste0("%", justify, width, "s"), collapse = "")
   tbl_content = do.call(sprintf, c(fmt = sptf_fmt, dt))
   tbl_header = do.call(sprintf, c(list(sptf_fmt), names(dt)))
   out = c(tbl_header, tbl_content)
@@ -306,7 +314,6 @@ load_files <- function(load_from,
                        full.names = TRUE,
                        load = FALSE,
                        ...) {
-
   files <-
     list.files(load_from, full.names = full.names, pattern = pattern)
   names(files) <-
@@ -317,14 +324,13 @@ load_files <- function(load_from,
   if (load == TRUE) {
     if (read_as_df == TRUE) {
       file.list <-
-        lapply(as.list(files), function(x){
-
-          if(use_fread == TRUE){
+        lapply(as.list(files), function(x) {
+          if (use_fread == TRUE) {
             df <- data.table::fread(x, na.strings = c("", "NA"))
             df <- tibble::as_tibble(df)
           }
 
-          if (use_fread == FALSE){
+          if (use_fread == FALSE) {
             read.csv(x, ...)
             # df <- tibble::as_tibble(df)
           }
@@ -365,14 +371,15 @@ file.copy.content.only <- function(from,
                                    pattern = ".*",
                                    overwrite = FALSE,
                                    copy.mode = TRUE,
-                                   copy.date = FALSE){
-
+                                   copy.date = FALSE) {
   list_of_files <- list.files(from, pattern)
-  file.copy(file.path(from,list_of_files),
-            to,
-            overwrite = overwrite,
-            copy.mode = copy.mode,
-            copy.date = copy.date)
+  file.copy(
+    file.path(from, list_of_files),
+    to,
+    overwrite = overwrite,
+    copy.mode = copy.mode,
+    copy.date = copy.date
+  )
 }
 
 
@@ -452,7 +459,6 @@ clear_dir <- function(dir,
                       pattern = ".csv",
                       recursive = F,
                       avoid = "^_") {
-
   df <- insp_dir(dir,
                  pattern = pattern,
                  recursive = recursive)
@@ -461,7 +467,7 @@ clear_dir <- function(dir,
     return(NA)
   }
 
-  to_excl <- sapply(df$names, function(x){
+  to_excl <- sapply(df$names, function(x) {
     grepl(x, pattern = avoid)
   })
 
@@ -472,6 +478,99 @@ clear_dir <- function(dir,
 
   return(file_to_remove)
 }
+
+
+
+#' wrapper function list.files to allow coppied windows path format containing backward slashes
+#'
+#' @param path
+#' @param return_str
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+list_files_fwd_slash <-
+  function(path = readr::clipboard(),
+           return_str = TRUE,
+           ...) {
+    path <- stringr::str_replace_all(path, "\\\\+", "/")
+
+    if (return_str == TRUE) {
+      return(path)
+    } else {
+      list.files(path = path, ...)
+    }
+  }
+
+#' check if is factor or character
+#'
+#' @param x
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' is_fct_or_chr(as.factor(c(1,2,3,3,4,2,2,1)))
+#' is_fct_or_chr(c("A","A","B","c"))
+is_fct_or_chr <- function(x) {
+  is.factor(x) | is.character(x)
+}
+
+#' get directory size
+#'
+#' @param path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_dir_size <- function(path) {
+  print(path)
+  files <- list.files(path, full.names = T, recursive = T)
+  vect_size <- sapply(files, function(x)
+    file.size(x))
+  if (length(vect_size) == 0) {
+    print("Directory is empty.")
+    df <- data.frame("folder" = path,
+                     "size" = 0,
+                     "unit" = "MB")
+    return(df)
+  }
+  size_files <- sum(vect_size)
+  print(glue::glue("path: {path} \n size: {size_files/10**6} MB"))
+  df <- data.frame("folder" = path,
+                   "size" = size_files / 10 ** 6,
+                   "unit" = "MB")
+
+  return(df)
+}
+
+#' list directory sizes
+#'
+#' @param root_dir
+#'
+#' @return
+#' @export
+#'
+#' @examples
+list_dir_sizes <- function(root_dir) {
+  folders <- list.files(root_dir, full.names = T, recursive = F)
+
+  foo <- lapply(folders, get_dir_size)
+  df <- do.call(rbind, foo)
+  df1 <- df[order(df$size, decreasing = T), ]
+  print("top 10 folders by size")
+  sapply(1:10, function(i) {
+    print(i)
+    print(tail(strsplit(df1$folder[i], "/")[[1]], n = 1))
+    print(paste0(df1$size[i], "MB"))
+    # print(glue::glue("{)}MB"))
+  })
+  return(df1)
+}
+
 
 
 # Encryption ----------------------------------------------------------------------------------
@@ -489,7 +588,6 @@ clear_dir <- function(dir,
 #' @examples
 gen_key <- function(key_file,
                     convert_to_sodium_key = FALSE) {
-
   key <- sodium::keygen()
   saveRDS(key, file = key_file, compress = FALSE)
 
@@ -514,13 +612,12 @@ gen_key <- function(key_file,
 encrypt <- function(file_orig,
                     file_enc,
                     key_file) {
-
-  if (file.exists(key_file)){
+  if (file.exists(key_file)) {
     key <- readRDS(file = key_file)
     key <- cyphr::key_sodium(key)
   }
 
-  if (!file.exists(key_file)){
+  if (!file.exists(key_file)) {
     key <- gen_key(key_file,
                    convert_to_sodium_key = TRUE)
   }
@@ -550,12 +647,11 @@ encrypt <- function(file_orig,
 decrypt <- function(file_enc,
                     file_orig,
                     key_file) {
-
-  if (file.exists(key_file)){
+  if (file.exists(key_file)) {
     key <- readRDS(file = key_file)
   }
 
-  if (!file.exists(key_file)){
+  if (!file.exists(key_file)) {
     stop(glue::glue("did not find key in {key_file}"))
   }
 
@@ -583,7 +679,6 @@ open_encrypted <- function(file_actual,
                            encrypt = FALSE,
                            key_file,
                            file_type = "r") {
-
   if (file.exists(file_actual) && encrypt == FALSE) {
     stop("decrypted file already exists, try use encrypt = TRUE if to encrypt the file first")
   } else if (file.exists(file_actual) && encrypt == TRUE) {

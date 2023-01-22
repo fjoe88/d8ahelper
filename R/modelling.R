@@ -1,7 +1,6 @@
 
-
-
 # pre-processing ------------------------------------------------------------------------------
+
 
 
 #' Filter high corr features and output in tidy format
@@ -14,8 +13,7 @@
 #'
 #' @examples
 corr_to_df <- function(cor,
-                       level = 0.9 #TODO: figure out proper th
-                       ) {
+                       level = 0.9) {
   cor <- abs(cor)
   cor[upper.tri(cor)] <- NA
   cor <- as.data.frame(cor)
@@ -67,7 +65,7 @@ remove_high_corr_features <-
       result <- d8ahelper::corr_to_df(descrCor, level = 1)
 
       col.to.remove <- which(names(df) %in% result$y)
-      df <- df[, -col.to.remove]
+      df <- df[,-col.to.remove]
 
       if (simplify == TRUE) {
         return(df)
@@ -82,15 +80,16 @@ remove_high_corr_features <-
     highlyCorDescr <-
       caret::findCorrelation(descrCor, cutoff = level) # col.id to remove
 
-    cor <- d8ahelper::corr_to_df(descrCor.df[, -highlyCorDescr], level = level)
+    cor <-
+      d8ahelper::corr_to_df(descrCor.df[,-highlyCorDescr], level = level)
     cor.removed <-
       d8ahelper::corr_to_df(descrCor.df[, highlyCorDescr], level = level)
 
     if (simplify == TRUE) {
-      descrCor.df[, -highlyCorDescr]
+      descrCor.df[,-highlyCorDescr]
     } else{
       list(
-        "df" = descrCor.df[, -highlyCorDescr],
+        "df" = descrCor.df[,-highlyCorDescr],
         "cor.df" = cor,
         "cor.removed.features" = cor.removed
       )
@@ -150,7 +149,7 @@ hclust_wss <- function(x,
                        visual = TRUE) {
   if (is.vector(x) == TRUE) {
     clust <- fastcluster::hclust.vector(freq, method = method)
-  } else if(is.matrix(x) == TRUE) {
+  } else if (is.matrix(x) == TRUE) {
     dist <- dist(x)
     clust <-
       fastcluster::hclust(dist, method = method, members = members)
@@ -173,7 +172,14 @@ hclust_wss <- function(x,
 
   if (visual == TRUE) {
     #screeplot
-    plot(seq_along(rank), rank, type = "b", pch = 19, xlab = "num of clusters", ylab = "wss")
+    plot(
+      seq_along(rank),
+      rank,
+      type = "b",
+      pch = 19,
+      xlab = "num of clusters",
+      ylab = "wss"
+    )
   }
 
   return(clust)
@@ -191,12 +197,17 @@ hclust_wss <- function(x,
 #' @param ycol
 #' @param zcol
 
-fill_map <- function(df, idcol, xcol='x', ycol='y', zcol='z'){
-
-  if (length(idcol) > 1){
-
-    combined_id_col <- Reduce(function(x,y){paste(x, y, sep="_")}, df[, idcol])
-    new_id <- paste(idcol, collapse="_")
+fill_map <- function(df,
+                     idcol,
+                     xcol = 'x',
+                     ycol = 'y',
+                     zcol = 'z') {
+  if (length(idcol) > 1) {
+    combined_id_col <-
+      Reduce(function(x, y) {
+        paste(x, y, sep = "_")
+      }, df[, idcol])
+    new_id <- paste(idcol, collapse = "_")
     df[[new_id]] <- combined_id_col
   } else {
     new_id <- idcol
@@ -204,31 +215,35 @@ fill_map <- function(df, idcol, xcol='x', ycol='y', zcol='z'){
 
   unique_id <- unique(df[[new_id]])
 
-  if(is.null(df[[zcol]])){stop("are you sure you had the correct z column name?")}
+  if (is.null(df[[zcol]])) {
+    stop("are you sure you had the correct z column name?")
+  }
 
-  df <- move_left(df, c(xcol,ycol,zcol))
+  df <- move_left(df, c(xcol, ycol, zcol))
   names(df)[1:3] <- c("x", "y", "z")
 
   pb <- progress::progress_bar$new(total = length(unique_id))
 
-  df_list <- lapply(unique_id, function(id){
-
+  df_list <- lapply(unique_id, function(id) {
     pb$tick()
 
-    subset_rows <- df[[new_id]]==id
+    subset_rows <- df[[new_id]] == id
 
-    df <- df[subset_rows, ]
+    df <- df[subset_rows,]
 
     is_empty_z <- is.na(df$z)
 
-    if (!any(is_empty_z)){
+    if (!any(is_empty_z)) {
       return(df)
     }
 
-    train <- df[!is_empty_z, ]
-    pred <- df[is_empty_z, ]
+    train <- df[!is_empty_z,]
+    pred <- df[is_empty_z,]
 
-    gs_model <- gstat::gstat(formula=z~1, locations = ~x+y, data=train)
+    gs_model <-
+      gstat::gstat(formula = z ~ 1,
+                   locations = ~ x + y,
+                   data = train)
     p <- predict(gs_model, pred)$var1.pred
 
     df$z[is_empty_z] <- p

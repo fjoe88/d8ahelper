@@ -1,4 +1,5 @@
 
+
 #' Remove leading and trailing white spaces
 #'
 #' By default, trim both leading and traling white spaces unless specified
@@ -125,8 +126,8 @@ subset_by_quantile <- function(df,
                                ...) {
   df <-
     dplyr::filter(df,
-           df[[col]] >= quantile(df[[col]], bottom, na.rm = TRUE),
-           df[[col]] <= quantile(df[[col]], 1 - top, na.rm = TRUE))
+                  df[[col]] >= quantile(df[[col]], bottom, na.rm = TRUE),
+                  df[[col]] <= quantile(df[[col]], 1 - top, na.rm = TRUE))
   return(df)
 
 }
@@ -171,13 +172,14 @@ coalesce_join <- function(x,
                           join = dplyr::left_join,
                           ...) {
   x <-
-    select(x, -c(names(.)[str_count(names(.), ".x|.y") >= 1]))
+    select(x,-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
 
   y <-
-    select(y, -c(names(.)[str_count(names(.), ".x|.y") >= 1]))
+    select(y,-c(names(.)[str_count(names(.), ".x|.y") >= 1]))
 
   joined <- join(x, y, by = by, suffix = suffix, ...)
-  joined <- select(joined, -c(names(.)[str_count(names(.), ".x|.y") >= 2]))
+  joined <-
+    select(joined,-c(names(.)[str_count(names(.), ".x|.y") >= 2]))
 
   # names of desired output
   cols <- union(names(x), names(y))
@@ -255,7 +257,7 @@ rm_single_unique_col <- function (df,
   df1 <- df[, ids, with = FALSE]
   rest <- setdiff(seq_along(df), ids)
   df2 <- df[, rest, with = FALSE]
-  df2 <- df2[, !sapply(df2, function(x) {
+  df2 <- df2[,!sapply(df2, function(x) {
     all(is.na(x))
   }), with = FALSE]
 
@@ -272,7 +274,7 @@ rm_single_unique_col <- function (df,
   }
 
 
-  df3 <- cbind(df1, df2[, !uniq %in% c(0:threshold), with = FALSE])
+  df3 <- cbind(df1, df2[,!uniq %in% c(0:threshold), with = FALSE])
   return(df3)
 }
 
@@ -303,12 +305,12 @@ rm_dups_w_less_data <- function(df, keys) {
 
   dups <- any_dups(dt, keys = keys)
 
-  dt.uniq <- dt[!dups$dup_row_bool,]
+  dt.uniq <- dt[!dups$dup_row_bool, ]
 
   dt.dup <- dups$dups
 
   not_missing <-
-    sapply(dt.dup[,-keys, with = FALSE], function(col) {
+    sapply(dt.dup[, -keys, with = FALSE], function(col) {
       if (!mode(col) %in% c("character", "factor")) {
         return(!(is.na(as.numeric(col)) | as.numeric(col) == ""))
       }
@@ -391,10 +393,10 @@ rm_na <- function(x) {
 remove_duplicates <- function(df, ...) {
   if (missing(...)) {
     print(names(df))
-    df1 <- unique(df[,])
+    df1 <- unique(df[, ])
     df2 <- purrr::transpose(df1)
 
-    df3 <- purrr::transpose(df[,])
+    df3 <- purrr::transpose(df[, ])
 
     df4 <-
       as.data.frame(sapply(df2, function(m) {
@@ -404,15 +406,15 @@ remove_duplicates <- function(df, ...) {
 
     names(df4) <- "count"
     df5 <- cbind(df4, df1)
-    df6 <- df5[order(df5$count, decreasing = TRUE),]
-    df7 <- df6[which(df6$count > 1),]
+    df6 <- df5[order(df5$count, decreasing = TRUE), ]
+    df7 <- df6[which(df6$count > 1), ]
 
     print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
     print(d8ahelper::headtail(df7))
     print(glue::glue(
       "Output dataframe of {nrow(df5)} rows containing no duplicates"
     ))
-    df5[,!(names(df5) == "count")]
+    df5[, !(names(df5) == "count")]
 
   } else {
     df1 <- unique(df[, c(...)])
@@ -428,16 +430,16 @@ remove_duplicates <- function(df, ...) {
 
     names(df4) <- "count"
     df5 <- cbind(df4, df1)
-    df6 <- df5[order(df5$count, decreasing = TRUE),]
+    df6 <- df5[order(df5$count, decreasing = TRUE), ]
 
-    df7 <- df6[which(df6$count > 1),]
+    df7 <- df6[which(df6$count > 1), ]
 
     print(glue::glue("Total of {nrow(df)-nrow(df5)} duplicated rows:"))
     print(d8ahelper::headtail(df7))
     print(glue::glue(
       "Output dataframe of {nrow(df5)} rows containing no duplicates"
     ))
-    df5[,!(names(df5) == "count")]
+    df5[, !(names(df5) == "count")]
 
   }
 }
@@ -451,7 +453,6 @@ remove_duplicates <- function(df, ...) {
 #'
 #' @example
 remove_dup_cols <- function(df_list) {
-
   all_col_names <- Reduce(c, sapply(df_list, names))
 
   occ_times <-
@@ -577,7 +578,7 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   df <- as.data.frame(df)
 
   any_missing <- Reduce("|", lapply(df[id_col], is.na))
-  df[any_missing, ] <- NULL
+  df[any_missing,] <- NULL
 
   label <- unique(df[, label_col])
 
@@ -601,7 +602,7 @@ puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   l <- lapply(unique(df[[new_id]]), function(x) {
     #pb$tick()
 
-    upper <- df[df[[new_id]] == x, ]
+    upper <- df[df[[new_id]] == x,]
     label_col_lower <- setdiff(label, upper[label_col])
 
     if (nrow(label_col_lower) == 0) {
@@ -680,7 +681,6 @@ clean_by_id <-
            var_col = NULL,
            filter_col = FALSE,
            th = 1) {
-
     dt <- data.table::as.data.table(df)
 
     #row operation by id cols
@@ -688,11 +688,11 @@ clean_by_id <-
       rowSums(is.na(dt[, id_col, with = FALSE])) == length(id_col)
 
     if (any(row_no_ids)) {
-      dt <- dt[-row_no_ids, ]
+      dt <- dt[-row_no_ids,]
     }
 
     if (is.null(var_col)) {
-      rhs <- dt[,-id_col, with = FALSE]
+      rhs <- dt[, -id_col, with = FALSE]
     }
 
     if (!is.null(var_col)) {
@@ -704,17 +704,17 @@ clean_by_id <-
       all(is.na(x))
     })
 
-    dt <- dt[!row_all_na,]
+    dt <- dt[!row_all_na, ]
 
     if (filter_col == FALSE) {
-      rhs <- rhs[!row_all_na,]
+      rhs <- rhs[!row_all_na, ]
     }
 
     #column operation to rhs
     if (filter_col == TRUE) {
       #rhs may be different since entire-empty rows were removed
       if (is.null(var_col)) {
-        rhs <- dt[,-id_col, with = FALSE]
+        rhs <- dt[, -id_col, with = FALSE]
       }
 
       if (!is.null(var_col)) {
@@ -797,7 +797,6 @@ decode_col <- function(df.list, df = df.list$df) {
 #'
 #' @examples
 get_name <- function(df, ...) {
-
   sapply(..., function(x)
     df$tag[[x]])
 }
@@ -812,7 +811,6 @@ get_name <- function(df, ...) {
 #'
 #' @examples
 get_id <- function(df, ...) {
-
   sapply(..., function(x)
     names(df$tag)[df$tag == x])
 }

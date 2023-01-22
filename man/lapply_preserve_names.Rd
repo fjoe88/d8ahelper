@@ -12,3 +12,6 @@ lapply_preserve_names(list, fun)
 \description{
 lapply wrapper but preserve object names as the name suggests
 }
+\examples{
+lapply_preserve_names(list(first.item=c(1,2,3), second.item=c(3,2,1)), function(x)paste0("each list member's name is accessible now! --> ", names(x)))
+}
