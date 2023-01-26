@@ -91,6 +91,7 @@ move_left <- function(df, str) {
 #'
 #' @example
 #' add_wmy(data.frame(date=Sys.Date()), dt_col = "date")
+
 add_wmy <- function(df, dt_col) {
   if (lubridate::is.Date(df[[dt_col]])) {
     df$dWeek <- as.factor(weekdays(df[[dt_col]]))
@@ -248,13 +249,6 @@ rm_single_unique_col <- function (df,
 
   df <- data.table::as.data.table(df)
 
-  # ids <- which(detect_id(df, combine_result = T))
-  #
-  # if (length(exclude) > 0) {
-  #   ids_excl <- which(names(df) %in% exclude)
-  #   ids <- union(ids, ids_excl)
-  # }
-
   ids_excl <- which(names(df) %in% exclude)
   ids <- ids_excl
 
@@ -287,6 +281,8 @@ rm_single_unique_col <- function (df,
 #'
 #' @param df
 #' @export
+#' @example
+#' remove_empty_rows(data.frame(a=c(1,NA,2), b=c("A",NA,NA)))
 
 remove_empty_rows <- function(df) {
   if (!is.data.frame(df))
@@ -304,6 +300,7 @@ remove_empty_rows <- function(df) {
 #'
 #' @example
 #' rm_dups_w_less_data(data.frame(a=c("a", "a", "b", "b"), b=c(NA,2,3,3)), "a")
+
 rm_dups_w_less_data <- function(df, keys) {
   dt <- data.table::as.data.table(df)
 
@@ -375,25 +372,29 @@ insert_nas <- function(df, percent = 0.2) {
   }))
 }
 
-#' Remove duplicated rows of the original data frame, or a subset of if column names being passed in
+
 
 #' Remove NAs given a vector
 #'
 #' @param x
 #' @export
+#' @example
+#' rm_na(c(1,2,NA,3))
 rm_na <- function(x) {
   x[!is.na(x)]
 }
 
-#' Remove duplicated rows
+#' Remove duplicated rows of the original data frame, or a subset of if column names being passed in
 #'
 #' @param df
-#' @param ...
+#' @param ... additional column names to be used for usbset by columns
 #'
 #' @return
 #' @export
 #'
 #' @examples
+#' @example
+#' remove_duplicates(data.frame(a=c(1,2,3,4,5,2), b=c(1,2,5,4,3,2), c=c(2,2,1,4,5,2)),c("b","c"))
 remove_duplicates <- function(df, ...) {
   if (missing(...)) {
     print(names(df))
@@ -448,15 +449,17 @@ remove_duplicates <- function(df, ...) {
   }
 }
 
-#' Taken a list of data frames, remove duplicazte columns that exist across multiple dataframes
+#' Taken a list of data frames, check each column and remove duplicated ones from each dataframe if they have already been identified in LHS data frames in the list
 #'
-#' @param df_list
+#' @param df_list a list of data.frame objects
+#' @param exclude names of columns that will be left alone from being removed
 #'
 #' @return
 #' @export
 #'
 #' @example
-remove_dup_cols <- function(df_list) {
+#' rm_dup_cols_in_a_list(list(a=data.frame(a=1,b=2,c=3), b=data.frame(a=2,b=3,d=1)))
+rm_dup_cols_in_a_list <- function(df_list, exclude=c()) {
   all_col_names <- Reduce(c, sapply(df_list, names))
 
   occ_times <-
@@ -464,6 +467,8 @@ remove_dup_cols <- function(df_list) {
       sum(x == all_col_names))
 
   col_more_than_one <- unique(all_col_names[occ_times > 1])
+
+  #reference for if a column has been preserved and ready to be removed if there are more
   col_kept <- character()
 
   new_list_of_df <- list()
@@ -472,10 +477,9 @@ remove_dup_cols <- function(df_list) {
     df <- df_list[[n]]
 
     matched_cols <- intersect(names(df), col_more_than_one)
-    id_cols <- names(df)[detect_id(df, combine_result = T)]
 
     #leave alone id cols
-    matched_cols <- setdiff(matched_cols, id_cols)
+    matched_cols <- setdiff(matched_cols, exclude)
 
     if (length(matched_cols) > 0) {
       for (col in matched_cols) {
@@ -495,7 +499,7 @@ remove_dup_cols <- function(df_list) {
 }
 
 
-#' Fill NAs and empty cells with fillers such as a character
+#' Identify NAs and empty cells that fit a pattern and replace
 #'
 #' @param df
 #' @param pat
@@ -505,8 +509,9 @@ remove_dup_cols <- function(df_list) {
 #' @export
 #'
 #' @example
-fill_na_as_missing <- function (df,
-                                pat = "^(\\s*\\[missing\\]\\s*|\\s*|NA|)$",
+#' na_as_missing(data.frame(a=c(NA,"","  ", "-","NA", "missing","only row without missing")))
+na_as_missing <- function (df,
+                                pat = "^(\\s*\\[*missing\\]*\\s*|\\s*|NA|\\s*-\\s*)$",
                                 fill = "-")
 {
   if (!is.data.frame(df)) {
@@ -527,18 +532,21 @@ fill_na_as_missing <- function (df,
   return(do.call(cbind, list_of_cols))
 }
 
-#' Sister func to fill_na_as_missing, replace cells with NAs if match to given string
+#' Sister func to na_as_missing, replace cells with NAs if match to given string
 #'
 #' @param df
 #' @param pattern
 #' @export
+#' @example
+#' missing_as_na(data.frame(a=c(NA, NA, "NA", "")))
+#' missing_as_na(fill_na_as_missing(data.frame(a=c(NA, NA, "NA", ""),b=c(2, 1, "", " "))))
 
-fill_as_na <- function(df, pattern = "[missing]") {
+missing_as_na <- function(df, pattern = "-") {
   df[df == pattern] <- NA
   df
 }
 
-#' Fill literal 'missing' or 'NA' with NAs
+#' Identify missing pattern or 'NA' and replace with NAs
 #'
 #' @param df
 #' @param fill
@@ -548,9 +556,10 @@ fill_as_na <- function(df, pattern = "[missing]") {
 #' @export
 #'
 #' @example
+#' fill_missing_as_na(fill_na_as_missing(data.frame(a=c(NA, NA, "NA", ""),b=c(2, 1, "", " "))))
 fill_missing_as_na <- function(df,
                                fill = NA,
-                               pat = "^(\\s*\\[missing\\]\\s*|\\s*|NA|)$") {
+                               pat = "^(\\s*\\[*missing\\]*\\s*|\\s*|NA|\\s*-\\s*)$") {
   if (!is.data.frame(df)) {
     message("not a dataframe, return original")
     return(df)
@@ -570,13 +579,15 @@ fill_missing_as_na <- function(df,
 #' Artificially increase the number of rows to make up any missing combinations by label columns for every unique id
 #' 'Puff up' the dataframe by filling in the missing entries with artificial data, default NA
 #' Will move id columns and label columns to the far left
-#' tidyr::crossing and tidyr::expand.grid perform similar function but do require loading up tidyr package first
+#' tidyr::crossing and tidyr::expand.grid perform similar function
 #'
 #' @param df
 #' @param id_col
 #' @param label_col
 #' @param fill_with
 #' @export
+#' @example
+#' puff_my_df(data.frame(id=c("a","b","d","e"), id2=c(1,2,2,2), label=c(1,2,3,4), data=c(1,2,3,4)), id_col="id", label_col= "id2", "missing")
 
 puff_my_df <- function(df, id_col, label_col, fill_with = NA) {
   df <- as.data.frame(df)
@@ -766,6 +777,8 @@ fill_cols <- function(df, th = 1, direction = "down") {
 #'
 #' @param df
 #' @export
+#' @example
+#' l <- encode_col(mtcars)
 
 encode_col <- function(df) {
   dict <- names(df)
@@ -784,11 +797,12 @@ encode_col <- function(df) {
 #' @param df.list: list object generated from d8ahelper::convert_col_name
 #' @param df: data frame to convert names from, default to df within df.list
 #' @export
-
+#' @example
+#' l <- decode_col(encode_col(mtcars))
 decode_col <- function(df.list, df = df.list$df) {
   names(df) <- sapply(names(df), function(x)
     df.list$tag[[x]])
-  df
+  return(df)
 }
 
 #' get names of encoded obj, sister func to encode_col, retrieve column names based on ids
@@ -800,6 +814,7 @@ decode_col <- function(df.list, df = df.list$df) {
 #' @export
 #'
 #' @examples
+#' get_name(encode_col(mtcars),c('c1','c3'))
 get_name <- function(df, ...) {
   sapply(..., function(x)
     df$tag[[x]])
@@ -814,6 +829,8 @@ get_name <- function(df, ...) {
 #' @export
 #'
 #' @examples
+#' get_id(encode_col(mtcars),'mpg')
+#' get_id(encode_col(mtcars),c('mpg','disp'))
 get_id <- function(df, ...) {
   sapply(..., function(x)
     names(df$tag)[df$tag == x])
