@@ -143,7 +143,7 @@ subset_by_quantile <- function(df,
 #' @param n a numeric, the number of rows of the outcome table after filling missing rows
 #' @export
 #' @example
-#' add_empty_rows(data_frame(a=c(1,2,3), b=c("a","b","c")), n = 5)
+#' add_empty_rows(data.frame(a=c(1,2,3), b=c("a","b","c")), n = 5)
 
 add_empty_rows <- function(df, n) {
   new.row <- rep(NA, length = ncol(df))
