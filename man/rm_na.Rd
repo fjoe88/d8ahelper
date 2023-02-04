@@ -2,12 +2,10 @@
 % Please edit documentation in R/transform.R
 \name{rm_na}
 \alias{rm_na}
-\title{Remove duplicated rows of the original data frame, or a subset of if column names being passed in
-Remove NAs given a vector}
+\title{Remove NAs given a vector}
 \usage{
 rm_na(x)
 }
 \description{
-Remove duplicated rows of the original data frame, or a subset of if column names being passed in
 Remove NAs given a vector
 }

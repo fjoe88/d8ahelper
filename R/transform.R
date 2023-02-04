@@ -169,7 +169,7 @@ add_empty_rows <- function(df, n) {
 #' @param ...
 #'
 #' @export
-#' @examples
+#' @example
 #' df1 <- data.frame(id=c("a","a","b","c"), id2=c(1,2,1,1), data=c(1,NA,NA,2))
 #' df2 <- data.frame(id=c("a","a","b","c"), id2=c(1,2,1,1), data=c(NA,3,NA,1))
 #' coalesce_join(df1,df2,by=c('id','id2'))

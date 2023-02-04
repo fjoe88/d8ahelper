@@ -2,17 +2,17 @@
 % Please edit documentation in R/transform.R
 \name{fill_missing_as_na}
 \alias{fill_missing_as_na}
-\title{Fill literal 'missing' or 'NA' with NAs}
+\title{Identify missing pattern or 'NA' and replace with NAs}
 \usage{
 fill_missing_as_na(
   df,
   fill = NA,
-  pat = "^(\\\\s*\\\\[missing\\\\]\\\\s*|\\\\s*|NA|)$"
+  pat = "^(\\\\s*\\\\[*missing\\\\]*\\\\s*|\\\\s*|NA|\\\\s*-\\\\s*)$"
 )
 }
 \arguments{
 \item{pat}{}
 }
 \description{
-Fill literal 'missing' or 'NA' with NAs
+Identify missing pattern or 'NA' and replace with NAs
 }

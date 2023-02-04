@@ -12,3 +12,7 @@ get_id(df, ...)
 \description{
 get id from encoded obj, sister func to encode_col, retrieve column id based on names
 }
+\examples{
+get_id(encode_col(mtcars),'mpg')
+get_id(encode_col(mtcars),c('mpg','disp'))
+}

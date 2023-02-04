@@ -2,13 +2,13 @@
 % Please edit documentation in R/transform.R
 \name{remove_duplicates}
 \alias{remove_duplicates}
-\title{Remove duplicated rows}
+\title{Remove duplicated rows of the original data frame, or a subset of if column names being passed in}
 \usage{
 remove_duplicates(df, ...)
 }
 \arguments{
-\item{...}{}
+\item{...}{additional column names to be used for usbset by columns}
 }
 \description{
-Remove duplicated rows
+Remove duplicated rows of the original data frame, or a subset of if column names being passed in
 }

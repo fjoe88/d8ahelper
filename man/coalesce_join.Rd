@@ -2,7 +2,7 @@
 % Please edit documentation in R/transform.R
 \name{coalesce_join}
 \alias{coalesce_join}
-\title{Coalescence join x, y data frames, for columns of same names, append y values to x if rows that are missing value}
+\title{Coalescence join lhs x and rhs y data frames, for each column-row combination, append rhs to lhs if missing, use lhs value if there are conflicts}
 \usage{
 coalesce_join(
   x,
@@ -13,6 +13,9 @@ coalesce_join(
   ...
 )
 }
+\arguments{
+\item{...}{}
+}
 \description{
-Coalescence join x, y data frames, for columns of same names, append y values to x if rows that are missing value
+Coalescence join lhs x and rhs y data frames, for each column-row combination, append rhs to lhs if missing, use lhs value if there are conflicts
 }

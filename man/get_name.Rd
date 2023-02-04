@@ -12,3 +12,6 @@ get_name(df, ...)
 \description{
 get names of encoded obj, sister func to encode_col, retrieve column names based on ids
 }
+\examples{
+get_name(encode_col(mtcars),c('c1','c3'))
+}
